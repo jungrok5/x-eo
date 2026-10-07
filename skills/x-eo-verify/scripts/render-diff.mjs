@@ -3,7 +3,9 @@
 // Needs: npm i playwright-core, and a Chromium (set PLAYWRIGHT_CHROMIUM=/path/to/chrome, or it uses Playwright's own).
 import { chromium } from 'playwright-core'
 import fs from 'node:fs'
-const [url, ...flags] = process.argv.slice(2)
+const argv = process.argv.slice(2)
+const flags = argv.filter((a, i) => a.startsWith('--') || argv[i - 1] === '--save')
+const url = argv.find((a, i) => !a.startsWith('--') && argv[i - 1] !== '--save')
 if (!url) { console.error('usage: node render-diff.mjs URL [--insecure] [--save FILE]'); process.exit(2) }
 const exe = process.env.PLAYWRIGHT_CHROMIUM || undefined
 const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] })
