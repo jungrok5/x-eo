@@ -1,0 +1,11 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "__SITE_URL__#person",
+  "name": "__FULL_NAME__",
+  "url": "__SITE_URL__",
+  "jobTitle": "__JOB_TITLE__",
+  "description": "__ONE_SENTENCE_BIO__",
+  "knowsAbout": ["__TOPIC_1__", "__TOPIC_2__"],
+  "sameAs": ["__GITHUB_URL__", "__LINKEDIN_URL__"]
+}

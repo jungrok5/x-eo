@@ -1,0 +1,11 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "__TITLE__",
+  "url": "__PAGE_URL__",
+  "inLanguage": "__LANG__",
+  "datePublished": "__YYYY-MM-DD__",
+  "author": { "@type": "Person", "name": "__AUTHOR__", "url": "__AUTHOR_URL__" },
+  "publisher": { "@id": "__SITE_URL__#org" },
+  "mainEntityOfPage": "__PAGE_URL__"
+}

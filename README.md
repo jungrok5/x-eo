@@ -12,39 +12,42 @@ those apart, so you can raise a score *without fooling yourself about what it me
 > readable files, AI text files, markup, or Markdown to appear in Google Search … Google Search
 > ignores them."*
 
-## What you get
+## What you get — four skills, one loop
 
-| | |
+```
+x-eo-audit  →  x-eo-fix  →  x-eo-verify  →  deploy  →  x-eo-audit (live)
+        ↑                x-eo = router + shared rules + knowledge
+```
+
+| Skill | Contents |
 |---|---|
-| `skills/x-eo/SKILL.md` | The workflow, the three **evidence tiers** (A documented · B plausible · C convention), honesty rules, report template |
-| `scripts/audit.sh` | Runs [geo-optimizer-skill](https://github.com/Auriti-Labs/geo-optimizer-skill) (MIT) in a throw-away, version-pinned venv; prints the score **and the score with Tier-C points removed**; tags each recommendation A/B/C/SEC; `--threshold` for CI |
-| `scripts/host-root-check.sh` | `robots.txt`, `llms.txt`, `/.well-known/*`, `/ai/*` are read at the **host root only** — catches sub-path sites (GitHub Pages project sites) where they silently don't count |
-| `scripts/render-diff.mjs` | Content with JavaScript on vs off (Playwright). Flags pages whose real content only exists after JS |
-| `scripts/jsonld-lint.py` | Parses every JSON-LD block in a build directory; separates parse errors from missing types |
-| `scripts/local-audit.py` | Test-only: audit your own `127.0.0.1` server (opt-in env var; loopback only) |
-| `references/` | `evidence.md` (what was verified vs merely reported), `pitfalls.md` (10 real traps), `tools.md` (reviewed alternatives) |
+| `x-eo` | Entry point: the three **evidence tiers** (A documented · B plausible · C convention), honesty rules, report template, topic map; `references/` = evidence ledger, 10 pitfalls, tool review, and **12 condensed topic guides vendored from [claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT)**: technical, on-page, content/E-E-A-T, schema, GEO, agentic, sitemap, images, hreflang, local, e-commerce, planning |
+| `x-eo-audit` | `audit.sh` — [geo-optimizer-skill](https://github.com/Auriti-Labs/geo-optimizer-skill) (MIT) in a pinned throw-away venv; score **and score excluding Tier C**; A/B/C/SEC tags; `--threshold` for CI. `host-root-check.sh` — robots/llms/sitemap/`.well-known` are read at the **host root only** |
+| `x-eo-fix` | `gen-robots.py` (per-bot policy, never blanket Disallow) · JSON-LD templates · sub-path→root scaffold · `html-to-llms-full.mjs` · `gen-ai-files.mjs` (Tier C) · `indexnow.mjs` |
+| `x-eo-verify` | `diff-builds.sh` (before/after build tree) · `jsonld-lint.py` · `render-diff.mjs` (JS on vs off, Playwright) · `local-audit.py` (your own 127.0.0.1 server) |
 
 ## Install
 
 ```bash
 git clone --depth 1 https://github.com/jungrok5/x-eo.git
-cp -r x-eo/skills/x-eo ~/.claude/skills/          # Claude Code (user-level)
-# or: cp -r x-eo/skills/x-eo .claude/skills/       # project-level
+mkdir -p ~/.claude/skills && cp -r x-eo/skills/* ~/.claude/skills/     # user-level
+# or project-level:  mkdir -p .claude/skills && cp -r x-eo/skills/* .claude/skills/
 ```
 
-No installer, no hooks, no global agents. Read the scripts first — they are short.
-Requirements: `bash`, `python3` (3.10+), and for `render-diff.mjs`: `npm i playwright-core` plus a
-Chromium (`PLAYWRIGHT_CHROMIUM=/path/to/chrome`).
+Install **all four** (they reference each other). No installer, no hooks, no global agents — read the scripts first, they are short.
+Requirements: `bash`, `python3` (3.10+), `git`; for `render-diff.mjs`: `npm i playwright-core` plus a Chromium (`PLAYWRIGHT_CHROMIUM=/path/to/chrome`).
 
-Then ask your agent: *"audit https://example.com for AI search readiness with x-eo."*
+Then ask your agent: *"use x-eo to audit https://example.com, fix what's Tier A, and verify."*
 
 ## Quick use without an agent
 
 ```bash
-bash skills/x-eo/scripts/audit.sh --threshold 80 https://example.com/
-bash skills/x-eo/scripts/host-root-check.sh https://example.com/blog/
-node skills/x-eo/scripts/render-diff.mjs https://example.com/
-python3 skills/x-eo/scripts/jsonld-lint.py ./dist --require WebSite --only "index.html" --strict
+S=x-eo/skills
+bash $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
+bash $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
+node $S/x-eo-verify/scripts/render-diff.mjs https://example.com/
+python3 $S/x-eo-verify/scripts/jsonld-lint.py ./dist --require WebSite --strict
+python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.xml --out robots.txt
 ```
 
 ## Worked example
@@ -66,8 +69,10 @@ which points are Tier C.
 ## Prior art and credit
 
 Reviewed while building this: claude-seo (AgriciDaniel), geo-optimizer-skill (Auriti-Labs),
-usegeoaeo, geo-audit, ultimate-seo-geo, and the GEO paper (arXiv 2311.09735). No code was copied;
-`references/tools.md` records what each is good and bad at. The evidence-tier idea is influenced
+usegeoaeo, geo-audit, ultimate-seo-geo, and the GEO paper (arXiv 2311.09735). claude-seo's topic guides are vendored (MIT, attribution in
+`skills/x-eo/references/claude-seo/NOTICE.md`); the rest is original. `references/tools.md` records what each tool is good and bad at. The evidence-tier idea is influenced
 by claude-seo giving `llms.txt` zero weight.
+
+Validate the repo layout: `python3 tests/validate.py`.
 
 MIT licensed.

@@ -1,0 +1,9 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "__SITE_URL__#org",
+  "name": "__ORG_NAME__",
+  "url": "__SITE_URL__",
+  "logo": "__LOGO_URL__",
+  "sameAs": ["__OFFICIAL_PROFILE_URL__"]
+}

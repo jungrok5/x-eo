@@ -1,56 +1,74 @@
 ---
 name: x-eo
-description: Audit and improve a website's visibility to search engines and AI answer engines (SEO + AEO + GEO) with evidence-graded recommendations. Use when asked to check or raise "AI search readiness", an AEO/GEO/SEO score, llms.txt, structured data (JSON-LD), AI-crawler access (robots.txt), or when a site scores low on tools such as geo-optimizer or tryoreum. Also use before/after any change made to raise such a score, to verify nothing user-facing broke.
+description: One-stop SEO + AEO + GEO toolkit entry point. Use for any request about search visibility, AI-search / answer-engine readiness, "GEO score", llms.txt, structured data (JSON-LD), robots.txt and AI crawlers, sitemaps, hreflang/i18n SEO, E-E-A-T/content, local or e-commerce SEO, or when a site scores low on tools like geo-optimizer or tryoreum. Routes to x-eo-audit (measure), x-eo-fix (change), x-eo-verify (prove nothing broke). Every recommendation is graded by evidence tier.
 ---
 
-# x-eo — SEO / AEO / GEO audit, graded by evidence
+# x-eo — router and shared rules
 
-Reply in the user's language. This skill exists because **an audit score is a proxy, not the outcome.**
-Tools reward files and markup; the thing you care about is whether crawlers can read the page and
-whether answer engines cite it. Every recommendation below carries an **evidence tier** so you never
-oversell a change.
+Reply in the user's language. **An audit score is a proxy, not the outcome.** Tools reward files and
+markup; what matters is whether crawlers can read the page and whether engines cite it. So every
+finding carries an evidence tier, and you never oversell.
 
-## Evidence tiers (label every finding with one)
+## Four skills, one loop
 
-| Tier | Meaning | Examples | How to treat it |
+| Skill | Job | Use when |
+|---|---|---|
+| `x-eo-audit` | Measure: scored audit (Tier C separated), host-root check, topic checklists | "how are we doing?", baseline, re-measure after deploy |
+| `x-eo-fix` | Change: robots, JSON-LD, llms-full, AI files, sub-path root, IndexNow | a finding needs implementing |
+| `x-eo-verify` | Prove: before/after build diff, JSON-LD parse, JS-on/off render diff | before shipping any change meant to raise a score |
+| `x-eo` (this) | Shared tiers, honesty rules, topic map | start here, or for pure advice/planning |
+
+Typical order: **audit → fix → verify → deploy → audit (live)**. Install all four together.
+
+## Evidence tiers (label every finding)
+
+| Tier | Meaning | Examples | Treatment |
 |---|---|---|---|
-| **A** | Vendor-documented or directly observable | page reachable (HTTP 200, no auth wall); content present in raw HTML without JavaScript; correct `canonical`/`hreflang`; sitemap; robots.txt not blocking the *search* crawlers; JSON-LD that parses and matches visible text | Fix first. Cheap to verify. |
-| **B** | Plausible, supported only by third-party or correlational studies | question-shaped headings, self-contained answer passages, freshness, consistent entity name + `sameAs`, original statistics, off-site mentions | Do when it also helps human readers. Say "plausible", never "proven". |
-| **C** | Convention with no demonstrated consumption | `llms.txt`, `llms-full.txt`, `/.well-known/ai.txt`, `/ai/*.json`, WebMCP attributes, `SearchAction` for agents, RSS-for-AI | Ship only if free and risk-free. **Never count toward success.** Google's AI-optimization guide (updated 2026-07-10) says it "ignores" such files and that no special markup is needed for generative features. |
+| **A** | Vendor-documented or directly observable | reachable (200, no auth wall); content in raw HTML without JS; correct canonical/hreflang; sitemap; robots not blocking search crawlers; JSON-LD that parses and matches visible text | Fix first |
+| **B** | Plausible; third-party/correlational support | question-shaped headings, self-contained answer passages, freshness, entity consistency + `sameAs`, original data, off-site mentions | Do when it also serves readers; say "plausible" |
+| **C** | Convention, no demonstrated consumption | `llms.txt`, `llms-full.txt`, `ai.txt`, `/ai/*.json`, WebMCP, agent `SearchAction`, RSS-for-AI | Only if free and risk-free. **Never count as success.** Google's AI guide (2026-07-10) says it ignores them |
+| **SEC** | Security finding | prompt-injection surface, exposed secrets | Report separately |
 
-Full source list and what was/was not verified: `references/evidence.md`.
+Sources and what was verified vs only reported: [references/evidence.md](references/evidence.md).
+Ten recurring traps: [references/pitfalls.md](references/pitfalls.md). Tool landscape: [references/tools.md](references/tools.md).
 
-## Workflow
+## Topic map — where the knowledge is
 
-0. **Scope & safety.** Read `references/pitfalls.md` once. Never `curl | bash` a tool; install into a throw-away venv with a pinned version (the scripts do this). Do not point audits at private/local addresses unless testing your own server (see `local-audit.py`).
-1. **Baseline.** `bash scripts/audit.sh <url> [<url>…]` — prints the tool score *and* the score with Tier-C points removed, plus each recommendation tagged A/B/C. Save the numbers.
-2. **Host-root check.** `bash scripts/host-root-check.sh <url>` — `robots.txt`, `llms.txt`, `/.well-known/*`, `/ai/*` are only read at the **host root**. Sites on a sub-path (GitHub Pages project sites, `/blog/`) silently fail this. Fix = a root site/repo or a root-level file, not a copy in the sub-path.
-3. **Render check.** `node scripts/render-diff.mjs <url>` — compares content with JavaScript on vs off. If the no-JS view is mostly empty, that is a Tier-A problem the score may not show.
-4. **Triage.** List failures by tier. Do A, then B where it also serves readers. Decide on C explicitly and record that it is optionality.
-5. **Change the source, not the output.** Many sites generate pages (static-site builders). Edit the generator/template, then rebuild. If the template doubles as an output file, make the build **idempotent** (see pitfalls: template pollution).
-6. **Verify before shipping.**
-   - Build before/after into separate directories and `diff -rq` them: only intended files may differ.
-   - `python3 scripts/jsonld-lint.py <dir>`: every JSON-LD block must parse; schemas must be truthful.
-   - `node scripts/render-diff.mjs` on the *changed* page: JS-on final DOM must be unchanged; JS-off content should improve.
-   - Spot-check unrelated pages against production: diff must be 0 lines.
-7. **Deploy, then re-measure on the live URL** with the same tool and version. Local scores are a preview only.
-8. **Submit.** Search Console: a URL-prefix property accepts only sitemaps *under that prefix*; a root sitemap is discovered via the `Sitemap:` line in root `robots.txt`. Bing Webmaster Tools can import from Search Console. IndexNow notifies Bing/Naver/Yandex (not Google).
-9. **Report** with the template below.
+Vendored, condensed from claude-seo (MIT, see [NOTICE](references/claude-seo/NOTICE.md)). Read only the file for the topic at hand.
+
+| Topic | File |
+|---|---|
+| Crawl/index, CWV, security headers, JS rendering, mobile | [technical](references/claude-seo/technical.md) |
+| Single-page on-page review (title, meta, headings, links) | [page-analysis](references/claude-seo/page-analysis.md) |
+| Content quality, E-E-A-T, AI-content, readability | [content-eeat](references/claude-seo/content-eeat.md) |
+| Structured data / JSON-LD types and rules | [schema](references/claude-seo/schema.md) |
+| GEO: AI Overviews, ChatGPT/Perplexity citation tactics, passage structure, llms.txt stance | [geo](references/claude-seo/geo.md) |
+| Agentic / MCP / machine-readable readiness | [agentic](references/claude-seo/agentic.md) |
+| Sitemaps (size limits, lastmod, index files) | [sitemap](references/claude-seo/sitemap.md) |
+| Images (alt, formats, lazy loading, OG) | [images](references/claude-seo/images.md) |
+| Multilingual: hreflang, locale URLs | [hreflang](references/claude-seo/hreflang.md) |
+| Local SEO / business profile | [local](references/claude-seo/local.md) |
+| E-commerce / product schema | [ecommerce](references/claude-seo/ecommerce.md) |
+| Strategy, roadmap, competitor framing | [planning](references/claude-seo/planning.md) |
+
+Claude-seo's advice is vendored as knowledge, not authority: where it conflicts with this file's tiers, the tiers win.
 
 ## Honesty rules
 
-- Do not invent facts to satisfy a check: no fake `dateModified`, no `sameAs` to profiles that are not the entity's, no made-up address/phone, no RSS feed with nothing to publish.
-- Do not add personal data (e.g. an email) to structured data on many pages just for a point.
-- Keyword-density or "boilerplate" warnings can be false positives on legitimate content; say so instead of rewriting text.
+- Don't invent facts to satisfy a check: no fake `dateModified`, no `sameAs` to profiles that aren't the entity's, no made-up address/phone/reviews.
+- Don't put personal data (email, phone) in structured data on many pages for a point.
+- Keyword-density / boilerplate warnings can be false positives on legitimate content — say so.
 - A tool's recommendation list is a menu, not a to-do list.
+- Report the score **and** the score excluding Tier C.
+- Citation in ChatGPT/Claude/Perplexity is **not measured** by anything here; don't promise it.
 
 ## Report template
 
 ```
 Scope: <urls>   Tool: <name+version>   Date: <date>
 Score: A → B   (excluding Tier C: a% → b%)
-Done:   [A] … [B] … [C] …           (each with evidence)
+Done:   [A] … [B] … [C] …
 Skipped: … (why)
-Verified: before/after diff, JSON-LD parse, JS on/off DOM, live re-measure
-Not expected to move: … (be explicit that Tier C points are optionality)
+Verified: build diff, JSON-LD parse, JS on/off DOM, live re-measure
+Not expected to move: … (Tier C points are optionality)
 ```
