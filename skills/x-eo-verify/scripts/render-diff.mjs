@@ -12,7 +12,7 @@ const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbo
 async function snap(js) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: js, reducedMotion: 'reduce', ignoreHTTPSErrors: flags.includes('--insecure') })
   const p = await ctx.newPage()
-  await p.goto(url, { waitUntil: 'networkidle' }); await p.waitForTimeout(1500)
+  await p.goto(url, { waitUntil: 'load', timeout: 60000 }); await p.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {}); await p.waitForTimeout(1500)   // pages with long-lived connections never go idle
   const r = await p.evaluate(() => {
     const txt = document.body.innerText || ''
     const main = document.querySelector('main')
