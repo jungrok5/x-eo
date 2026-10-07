@@ -30,7 +30,7 @@ Typical order: **audit → fix → verify → deploy → audit (live)**. Install
 | **SEC** | Security finding | prompt-injection surface, exposed secrets | Report separately |
 
 Sources and what was verified vs only reported: [references/evidence.md](references/evidence.md).
-Ten recurring traps: [references/pitfalls.md](references/pitfalls.md). Tool landscape: [references/tools.md](references/tools.md).
+Thirteen recurring traps: [references/pitfalls.md](references/pitfalls.md). Tool landscape: [references/tools.md](references/tools.md).
 
 ## Topic map — where the knowledge is
 
@@ -50,6 +50,7 @@ Vendored, condensed from claude-seo (MIT, see [NOTICE](references/claude-seo/NOT
 | Local SEO / business profile | [local](references/claude-seo/local.md) |
 | E-commerce / product schema | [ecommerce](references/claude-seo/ecommerce.md) |
 | Strategy, roadmap, competitor framing | [planning](references/claude-seo/planning.md) |
+| Korea: Naver Search Advisor, Yeti/Daumoa, KakaoTalk previews, IndexNow | [korea](references/korea.md) (original) |
 
 Claude-seo's advice is vendored as knowledge, not authority: where it conflicts with this file's tiers, the tiers win.
 
@@ -60,7 +61,7 @@ Claude-seo's advice is vendored as knowledge, not authority: where it conflicts 
 - Keyword-density / boilerplate warnings can be false positives on legitimate content — say so.
 - A tool's recommendation list is a menu, not a to-do list.
 - Report the score **and** the score excluding Tier C.
-- Citation in ChatGPT/Claude/Perplexity is **not measured** by anything here; don't promise it.
+- Citation in ChatGPT/Claude/Perplexity is only **sampled** (`x-eo-audit/scripts/ai-recall.mjs`, needs API keys), never measured as a rate; don't promise it.
 
 ## Report template
 

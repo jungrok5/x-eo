@@ -21,8 +21,8 @@ x-eo-audit  →  x-eo-fix  →  x-eo-verify  →  deploy  →  x-eo-audit (live)
 
 | Skill | Contents |
 |---|---|
-| `x-eo` | Entry point: the three **evidence tiers** (A documented · B plausible · C convention), honesty rules, report template, topic map; `references/` = evidence ledger, 10 pitfalls, tool review, and **12 condensed topic guides vendored from [claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT)**: technical, on-page, content/E-E-A-T, schema, GEO, agentic, sitemap, images, hreflang, local, e-commerce, planning |
-| `x-eo-audit` | `audit.sh` — [geo-optimizer-skill](https://github.com/Auriti-Labs/geo-optimizer-skill) (MIT) in a pinned throw-away venv; score **and score excluding Tier C**; A/B/C/SEC tags; `--threshold` for CI. `host-root-check.sh` — robots/llms/sitemap/`.well-known` are read at the **host root only** |
+| `x-eo` | Entry point: the three **evidence tiers** (A documented · B plausible · C convention), honesty rules, report template, topic map; `references/` = evidence ledger, 10 pitfalls, tool review, and **`korea.md` (Naver Search Advisor · Yeti/Daumoa · KakaoTalk OG · IndexNow), and **12 condensed topic guides vendored from [claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT)**: technical, on-page, content/E-E-A-T, schema, GEO, agentic, sitemap, images, hreflang, local, e-commerce, planning** |
+| `x-eo-audit` | `audit.sh` — [geo-optimizer-skill](https://github.com/Auriti-Labs/geo-optimizer-skill) (MIT) in a pinned throw-away venv; score **and score excluding Tier C**; A/B/C/SEC tags; `--threshold` for CI. `host-root-check.sh` — robots/llms/sitemap/`.well-known` are read at the **host root only**. `site-sample.py` — robots → sitemap → N pages: titles, descriptions, canonical, H1, OG, JSON-LD, thin pages, duplicates, redirect-stub root (stdlib). `ai-recall.mjs` — brand-free questions to retrieval-enabled engines; counts **cited URLs** on your host (needs API keys) |
 | `x-eo-fix` | `gen-robots.py` (per-bot policy, never blanket Disallow) · JSON-LD templates · sub-path→root scaffold · `html-to-llms-full.mjs` · `gen-ai-files.mjs` (Tier C) · `indexnow.mjs` |
 | `x-eo-verify` | `diff-builds.sh` (before/after build tree) · `jsonld-lint.py` · `render-diff.mjs` (JS on vs off, Playwright) · `local-audit.py` (your own 127.0.0.1 server) |
 
@@ -46,6 +46,7 @@ S=x-eo/skills
 bash $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
 bash $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
 node $S/x-eo-verify/scripts/render-diff.mjs https://example.com/
+python3 $S/x-eo-audit/scripts/site-sample.py https://example.com/ --max 8
 python3 $S/x-eo-verify/scripts/jsonld-lint.py ./dist --require WebSite --strict
 python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.xml --out robots.txt
 ```
@@ -60,10 +61,10 @@ which points are Tier C.
 
 - **Tier labels are keyword heuristics** in `audit.sh`, not understanding. They can be wrong; read the finding.
 - **One scorer.** Categories and weights belong to geo-optimizer-skill's author. Scores of different tools are not comparable; compare the *same* tool and version before/after.
-- **No citation measurement.** Nothing here tells you whether ChatGPT/Claude/Perplexity actually cite you. That needs monitoring tools and API keys (see `references/tools.md`).
+- **Citation is sampled, not measured.** `ai-recall.mjs` asks a handful of questions through web-search-enabled APIs and counts cited URLs; it needs your API keys, costs money per question, and varies run to run. Perplexity is not covered. Monitoring over time needs dedicated tools (see `references/tools.md`).
 - `local-audit.py` reaches into geo-optimizer internals and may break on upgrade (hence the pinned version).
 - The 50% no-JS threshold in `render-diff.mjs` is a judgement call, not a standard.
-- Tested on Linux only. Korean/Naver-specific signals are not covered.
+- Tested on Linux only. `korea.md` covers Naver/Daum/Kakao basics; it is dated and not exhaustive.
 - Evidence ledger is dated; re-verify before relying on it.
 
 ## Prior art and credit

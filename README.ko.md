@@ -9,8 +9,8 @@ AI 검색 준비도 도구 대부분은 0~100점과 할 일 목록을 줍니다.
 
 ## 구성 — 스킬 4개, 하나의 루프
 `x-eo-audit`(측정) → `x-eo-fix`(수정) → `x-eo-verify`(검증) → 배포 → `x-eo-audit`(실서비스 재측정). `x-eo`는 진입점·공통 규칙·지식.
-- `x-eo` — 증거 등급 A(문서화)·B(그럴듯함)·C(관례), 정직 원칙, 보고 양식, 주제별 지도. `references/`에 증거 장부·함정 10개·도구 리뷰와 **claude-seo(MIT)에서 가져온 주제 가이드 12개**(기술·온페이지·콘텐츠/E-E-A-T·스키마·GEO·에이전트·사이트맵·이미지·hreflang·로컬·이커머스·기획)
-- `x-eo-audit` — `audit.sh`(geo-optimizer-skill, 버전 고정 임시 venv, **Tier C 제외 점수** 병기), `host-root-check.sh`(robots/llms/sitemap은 **호스트 루트에서만** 읽힘)
+- `x-eo` — 증거 등급 A(문서화)·B(그럴듯함)·C(관례), 정직 원칙, 보고 양식, 주제별 지도. `references/`에 증거 장부·함정 10개·도구 리뷰와 `korea.md`(네이버 서치어드바이저·Yeti/Daumoa·카카오톡 OG·IndexNow)와 **claude-seo(MIT)에서 가져온 주제 가이드 12개**(기술·온페이지·콘텐츠/E-E-A-T·스키마·GEO·에이전트·사이트맵·이미지·hreflang·로컬·이커머스·기획)
+- `x-eo-audit` — `audit.sh`(geo-optimizer-skill, 버전 고정 임시 venv, **Tier C 제외 점수** 병기), `host-root-check.sh`(robots/llms/sitemap은 **호스트 루트에서만** 읽힘), `site-sample.py`(사이트맵에서 N페이지 표본: 제목·설명·canonical·H1·OG·JSON-LD·얇은 페이지·중복·리다이렉트 스텁 루트), `ai-recall.mjs`(브랜드 없는 질문을 검색 연동 AI에 묻고 **내 URL 인용** 여부 집계, API 키 필요)
 - `x-eo-fix` — `gen-robots.py`, JSON-LD 템플릿, 하위경로→루트 스캐폴드, `html-to-llms-full.mjs`, `gen-ai-files.mjs`(Tier C), `indexnow.mjs`
 - `x-eo-verify` — `diff-builds.sh`(전/후 빌드 비교), `jsonld-lint.py`, `render-diff.mjs`(JS 켬/끔), `local-audit.py`(로컬 서버)
 
@@ -23,7 +23,7 @@ mkdir -p ~/.claude/skills && cp -r x-eo/skills/* ~/.claude/skills/
 
 ## 이 스킬의 한계 (자기 검토)
 등급 분류는 키워드 휴리스틱이라 틀릴 수 있고, 점수 기준은 외부 도구 작성자의 것이며, 실제 AI 인용
-여부는 측정하지 않습니다. `local-audit.py`는 도구 내부에 의존해 업그레이드 시 깨질 수 있고, 리눅스에서만
+여부는 표본으로만 확인합니다(비율 측정 아님). `local-audit.py`는 도구 내부에 의존해 업그레이드 시 깨질 수 있고, 리눅스에서만
 시험했습니다. 근거 문서는 날짜가 있으니 사용 전에 다시 확인하세요.
 
 claude-seo 가이드는 MIT 출처 표기와 함께 포함됩니다(`skills/x-eo/references/claude-seo/NOTICE.md`).

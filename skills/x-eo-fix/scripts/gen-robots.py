@@ -16,6 +16,7 @@ import argparse, sys
 # (token, vendor, purpose)  purpose: search | user | train
 BOTS = [
     ("Googlebot", "Google", "classic"), ("Bingbot", "Microsoft", "classic"),
+    ("Yeti", "Naver (Korea)", "classic"), ("Daumoa", "Daum/Kakao (Korea)", "classic"),
     ("OAI-SearchBot", "OpenAI", "search"), ("ChatGPT-User", "OpenAI", "user"), ("GPTBot", "OpenAI", "train"),
     ("Claude-SearchBot", "Anthropic", "search"), ("Claude-User", "Anthropic", "user"), ("ClaudeBot", "Anthropic", "train"),
     ("PerplexityBot", "Perplexity", "search"), ("Perplexity-User", "Perplexity", "user"),
