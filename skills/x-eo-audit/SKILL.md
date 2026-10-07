@@ -23,3 +23,4 @@ Scripts below are relative to this skill's directory.
 - Only audit sites the user owns or may test. Never point at private/loopback addresses (the tool refuses; keep it that way). For your own dev server use `../x-eo-verify/scripts/local-audit.py`.
 - Scores of different tools are not comparable. Compare same tool, same version, before/after.
 - The scorer's weights are its author's opinion, not search-engine behaviour.
+- **SEC findings need a second look.** The UGC/injection check matches class names (`respond`, `comments`, …). Report it only after confirming a real write path (form, textarea, API) exists; otherwise label it a false positive (pitfall 11).
