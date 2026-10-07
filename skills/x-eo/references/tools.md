@@ -9,6 +9,5 @@
 | **ultimate-seo-geo** (mykpono) | MIT · ~86★ | 50+ Python scripts + AGENTS.md; claims "100% pass rate" on its own evals | Unvetted claims; not tested here. |
 | **GEO-optim/GEO** | Apache-2.0 · ~340★ | Paper reference code + GEO-BENCH | Research tool for content tactics, not an auditor. |
 | Elmo, OneGlance | MIT (per chat assistant) | Self-hosted AI-answer monitoring | Different job (tracking mentions over time); needs LLM keys. Not verified. |
-| tryoreum.com | SaaS | Korean-search-focused SEO + "AI search readiness" (question headings, llms.txt, content/code ratio) | Login required; use as a second opinion for Naver/Korean context. |
 
 Scores from different tools are **not comparable**. Compare before/after of the *same* tool and version.

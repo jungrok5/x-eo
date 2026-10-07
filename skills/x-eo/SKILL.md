@@ -1,6 +1,6 @@
 ---
 name: x-eo
-description: One-stop SEO + AEO + GEO toolkit entry point. Use for any request about search visibility, AI-search / answer-engine readiness, "GEO score", llms.txt, structured data (JSON-LD), robots.txt and AI crawlers, sitemaps, hreflang/i18n SEO, E-E-A-T/content, local or e-commerce SEO, or when a site scores low on tools like geo-optimizer or tryoreum. Routes to x-eo-audit (measure), x-eo-fix (change), x-eo-verify (prove nothing broke). Every recommendation is graded by evidence tier.
+description: One-stop SEO + AEO + GEO toolkit entry point. Use for any request about search visibility, AI-search / answer-engine readiness, "GEO score", llms.txt, structured data (JSON-LD), robots.txt and AI crawlers, sitemaps, hreflang/i18n SEO, E-E-A-T/content, local or e-commerce SEO, or when a site scores low on any SEO/GEO checker. Routes to x-eo-audit (measure), x-eo-fix (change), x-eo-verify (prove nothing broke). Every recommendation is graded by evidence tier.
 ---
 
 # x-eo — router and shared rules
