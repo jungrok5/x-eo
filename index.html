@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x-eo: SEO, AEO and GEO audits graded by evidence</title>
+<meta name="description" content="Claude Code skills that audit a site for search engines and AI answer engines, fix the findings and verify the fix, with an evidence tier on every recommendation.">
+<link rel="canonical" href="https://jungrok5.github.io/x-eo/">
+<link rel="alternate" hreflang="en" href="https://jungrok5.github.io/x-eo/">
+<link rel="alternate" hreflang="ko" href="https://jungrok5.github.io/x-eo/ko/">
+<link rel="alternate" hreflang="x-default" href="https://jungrok5.github.io/x-eo/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="x-eo: SEO, AEO and GEO audits graded by evidence">
+<meta property="og:description" content="Claude Code skills that audit a site for search engines and AI answer engines, fix the findings and verify the fix, with an evidence tier on every recommendation.">
+<meta property="og:url" content="https://jungrok5.github.io/x-eo/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:,">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "x-eo", "url": "https://jungrok5.github.io/x-eo/", "codeRepository": "https://github.com/jungrok5/x-eo", "description": "Claude Code skills that audit a site for search engines and AI answer engines, fix the findings and verify the fix, with an evidence tier on every recommendation.", "inLanguage": "en", "license": "https://opensource.org/licenses/MIT", "programmingLanguage": ["Python", "JavaScript", "Shell"], "runtimePlatform": "Claude Code"}</script>
+<link rel="stylesheet" href="assets/design/tokens.css">
+<link rel="stylesheet" href="assets/design/components.css">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/design/theme.js"></script>
+</head>
+<body>
+<header class="ds-topbar top">
+  <a class="brand" href="./">x-eo</a>
+  <nav>
+    <a href="#install">Install</a>
+    <a href="https://github.com/jungrok5/x-eo">GitHub</a>
+    <a href="ko/" hreflang="ko" lang="ko">한국어</a>
+    <button type="button" class="theme-toggle" data-dark="Dark mode" data-light="Light mode">Dark mode</button>
+  </nav>
+</header>
+<main class="ds-page">
+<section class="hero">
+  <div>
+    <h1>Audit a site for search and AI answers, and know which points are real</h1>
+    <p class="ds-lede">Four Claude Code skills measure a site, fix the source, and prove that nothing else changed. Every finding carries an evidence tier, and the score is reported with and without the points that no engine has been shown to use.</p>
+    <div class="actions"><a class="ds-btn ds-btn--primary" href="#install">Install</a><a class="ds-btn" href="https://github.com/jungrok5/x-eo">Source on GitHub</a></div>
+  </div>
+  <figure class="term"><figcaption>audit.sh on a live site, 2026-10-07 (lines shortened)</figcaption><pre tabindex="0"><code><span class="ds-c">$</span> bash audit.sh https://one-scroll-bible.com/
+== https://one-scroll-bible.com/   (geo-optimizer-skill 4.18.3)
+   score 90/100 (excellent)   <span class="hl">excluding Tier C: 68/76 = 89%</span>
+   robots=18/18, llms=16/18, schema=16/16, meta=14/14, content=12/12,
+   signals=3/6, ai_discovery=6/6, brand_entity=5/10, penalty=0
+   [B] Add sameAs links in Organization schema to Wikipedia, Wikidata, ...
+   [C] Add RSS/Atom feed and link it in &lt;head&gt; ...
+   [C] Add potentialAction (SearchAction) to WebSite schema ...
+   [SEC] This page exposes user-generated content ('respond' region) ...</code></pre></figure>
+</section>
+<section id="tiers">
+  <h2>Evidence tiers</h2>
+  <p>AI search checkers mix three kinds of advice in one list: documented crawler behavior, plausible practice, and conventions such as <code>llms.txt</code> that no major engine has been shown to read. Google's AI optimization guide (updated 2026-07-10) says Google Search ignores AI text files and special markup.</p><p>x-eo labels every finding with a tier. A score that rose only through Tier C points is reported as such.</p>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>Tier</th><th>Meaning</th><th>Examples</th><th>Treatment</th></tr></thead><tbody><tr><td class="tier">A</td><td>Documented by the engine or directly observable</td><td>HTTP 200, content in raw HTML, canonical, hreflang, sitemap, JSON-LD that parses and matches the page</td><td>Fix first</td></tr><tr><td class="tier">B</td><td>Supported only by third-party or correlational studies</td><td>Answer-shaped passages, freshness, consistent entity name and <code>sameAs</code></td><td>Do it when it also helps readers</td></tr><tr><td class="tier">C</td><td>Convention without demonstrated use</td><td><code>llms.txt</code>, <code>ai.txt</code>, <code>/ai/*.json</code>, WebMCP</td><td>Only if free; never counted as a result</td></tr><tr><td class="tier">SEC</td><td>Security finding</td><td>Prompt-injection surface, exposed secrets</td><td>Confirm a real write path before reporting</td></tr></tbody></table></div>
+</section>
+<section id="skills">
+  <h2>Four skills, one loop</h2>
+  <figure class="ds-figure"><ol class="loop"><li><code>x-eo-audit</code><span>Measure the live site</span></li><li><code>x-eo-fix</code><span>Change the source, not the output</span></li><li><code>x-eo-verify</code><span>Build diff, JSON-LD, JavaScript on and off</span></li><li><code>deploy</code><span>Then audit the live URL again</span></li></ol><p class="loop-back">After deploy, the loop starts again from x-eo-audit with the same tool and version.</p><p class="shared"><code>x-eo</code> holds what the other three share: the tiers, honesty rules, report template, 13 pitfalls, a Korea guide (Naver, Daum, KakaoTalk), and 12 topic guides from claude-seo (MIT).</p></figure>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>Skill</th><th>Scripts</th></tr></thead><tbody><tr><td><code>x-eo-audit</code></td><td><code>audit.sh</code> (score with and without Tier C, <code>--threshold</code> for CI), <code>host-root-check.sh</code>, <code>site-sample.py</code>, <code>ai-recall.mjs</code> (citations of your URLs by search-enabled AI APIs)</td></tr><tr><td><code>x-eo-fix</code></td><td><code>gen-robots.py</code>, JSON-LD templates, root files for sub-path sites, <code>html-to-llms-full.mjs</code>, <code>gen-ai-files.mjs</code>, <code>indexnow.mjs</code></td></tr><tr><td><code>x-eo-verify</code></td><td><code>diff-builds.sh</code>, <code>jsonld-lint.py</code>, <code>render-diff.mjs</code> (Playwright), <code>local-audit.py</code></td></tr></tbody></table></div>
+</section>
+<section id="install">
+  <h2>Install</h2>
+  <p>Copy all four skills; they reference each other. There is no installer, hook or background agent.</p>
+  <ol class="ds-steps"><li><div><h3>Clone and copy the skills</h3><div class="ds-cmd"><pre><code>git clone --depth 1 https://github.com/jungrok5/x-eo.git
+mkdir -p ~/.claude/skills &amp;&amp; cp -r x-eo/skills/* ~/.claude/skills/</code></pre><button type="button" data-copied="Copied" data-failed="Copy failed">Copy</button></div></div></li><li><div><h3>Ask Claude Code</h3><p><code>Audit https://example.com with x-eo, fix the Tier A findings, and verify.</code></p></div></li></ol>
+  <p class="ds-muted">Requirements: <code>bash</code>, <code>git</code>, <code>python3</code> 3.10 or later. <code>render-diff.mjs</code> also needs <code>playwright-core</code> and a Chromium path in <code>PLAYWRIGHT_CHROMIUM</code>. <code>ai-recall.mjs</code> needs an Anthropic or OpenAI API key and costs one search-enabled request per question and engine.</p>
+</section>
+<section id="direct">
+  <h2>Run the scripts without an agent</h2>
+  <div class="ds-cmd"><pre><code>S=x-eo/skills
+bash    $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
+bash    $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
+python3 $S/x-eo-audit/scripts/site-sample.py https://example.com/ --max 8
+node    $S/x-eo-verify/scripts/render-diff.mjs https://example.com/
+python3 $S/x-eo-verify/scripts/jsonld-lint.py ./dist --require WebSite --strict
+python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.xml --out robots.txt</code></pre><button type="button" data-copied="Copied" data-failed="Copy failed">Copy</button></div>
+</section>
+<section id="example">
+  <h2>Example: a 214-language static site, 62 to 90</h2>
+  <p>12 of the 28 points were Tier C. Without them the score moved from 52/76 to 68/76.</p><p>The change with measurable value was prerendering the Korean root page: text visible without JavaScript rose from 11% to 53% of the rendered page, and the JavaScript-on DOM stayed byte-identical.</p>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>Category</th><th class="num">Before</th><th class="num">After</th><th>Tier</th></tr></thead><tbody><tr><td><code>robots</code></td><td class="num">15</td><td class="num">18</td><td class="tier">A</td></tr><tr><td><code>llms</code></td><td class="num">10</td><td class="num">16</td><td class="tier">C</td></tr><tr><td><code>ai_discovery</code></td><td class="num">0</td><td class="num">6</td><td class="tier">C</td></tr><tr><td><code>schema</code></td><td class="num">7</td><td class="num">16</td><td class="tier">B</td></tr><tr><td><code>content</code></td><td class="num">11</td><td class="num">12</td><td class="tier">A</td></tr><tr><td><code>penalty</code></td><td class="num">-3</td><td class="num">0</td><td class="tier">A/B</td></tr><tr><td><strong>Total</strong></td><td class="num">62</td><td class="num"><strong>90</strong></td><td></td></tr></tbody></table></div>
+  <p><a href="https://github.com/jungrok5/x-eo/blob/main/examples/one-scroll-bible.md">Full write-up</a></p>
+</section>
+<section id="limits">
+  <h2>Limits</h2>
+  <ul class="plain"><li><code>audit.sh</code> assigns tiers with keyword rules. A label can be wrong; read the finding.</li><li>Scores come from one tool and its author's weights. Compare the same tool and version before and after, not different tools.</li><li><code>ai-recall.mjs</code> takes a sample, not a rate. Answers vary between runs; Perplexity is not covered.</li><li><code>local-audit.py</code> patches geo-optimizer internals and can break on upgrade; the version is pinned.</li><li>Tested on Linux. The evidence ledger and the Korea guide are dated; check them again before relying on them.</li></ul>
+</section>
+<footer class="site"><p>MIT license. Topic guides in <code>skills/x-eo/references/claude-seo/</code> come from claude-seo (MIT).</p><p>Page built on the "Clear" design system from <a href="https://github.com/jungrok5/ai-design">ai-design</a>.</p></footer>
+</main>
+<script src="assets/design/copy.js" defer></script>
+</body>
+</html>

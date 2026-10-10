@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x-eo: 증거 등급을 붙이는 SEO·AEO·GEO 점검</title>
+<meta name="description" content="검색엔진과 AI 답변 엔진 관점에서 사이트 점검, 수정, 수정 결과 검증을 맡는 Claude Code 스킬입니다. 모든 권고에 증거 등급을 붙입니다.">
+<link rel="canonical" href="https://jungrok5.github.io/x-eo/ko/">
+<link rel="alternate" hreflang="en" href="https://jungrok5.github.io/x-eo/">
+<link rel="alternate" hreflang="ko" href="https://jungrok5.github.io/x-eo/ko/">
+<link rel="alternate" hreflang="x-default" href="https://jungrok5.github.io/x-eo/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="x-eo: 증거 등급을 붙이는 SEO·AEO·GEO 점검">
+<meta property="og:description" content="검색엔진과 AI 답변 엔진 관점에서 사이트 점검, 수정, 수정 결과 검증을 맡는 Claude Code 스킬입니다. 모든 권고에 증거 등급을 붙입니다.">
+<meta property="og:url" content="https://jungrok5.github.io/x-eo/ko/">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:,">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "x-eo", "url": "https://jungrok5.github.io/x-eo/ko/", "codeRepository": "https://github.com/jungrok5/x-eo", "description": "검색엔진과 AI 답변 엔진 관점에서 사이트 점검, 수정, 수정 결과 검증을 맡는 Claude Code 스킬입니다. 모든 권고에 증거 등급을 붙입니다.", "inLanguage": "ko", "license": "https://opensource.org/licenses/MIT", "programmingLanguage": ["Python", "JavaScript", "Shell"], "runtimePlatform": "Claude Code"}</script>
+<link rel="stylesheet" href="../assets/design/tokens.css">
+<link rel="stylesheet" href="../assets/design/components.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/design/theme.js"></script>
+</head>
+<body>
+<header class="ds-topbar top">
+  <a class="brand" href="../">x-eo</a>
+  <nav>
+    <a href="#install">설치</a>
+    <a href="https://github.com/jungrok5/x-eo">GitHub</a>
+    <a href="../" hreflang="en" lang="en">English</a>
+    <button type="button" class="theme-toggle" >다크 모드</button>
+  </nav>
+</header>
+<main class="ds-page">
+<section class="hero">
+  <div>
+    <h1>검색과 AI 답변 기준의 사이트 점검, 어느 점수가 실제인지까지 구분합니다</h1>
+    <p class="ds-lede">Claude Code 스킬 4개가 사이트 측정, 소스 수정, 다른 곳이 바뀌지 않았다는 확인을 차례로 맡습니다. 모든 항목에 증거 등급을 붙이고, 점수는 어느 엔진도 쓴다고 확인되지 않은 항목을 포함한 값과 뺀 값으로 함께 보고합니다.</p>
+    <div class="actions"><a class="ds-btn ds-btn--primary" href="#install">설치 명령 보기</a><a class="ds-btn" href="https://github.com/jungrok5/x-eo">GitHub 소스</a></div>
+  </div>
+  <figure class="term"><figcaption>실제 사이트에 실행한 audit.sh, 2026-10-07 (줄 일부 생략)</figcaption><pre tabindex="0"><code><span class="ds-c">$</span> bash audit.sh https://one-scroll-bible.com/
+== https://one-scroll-bible.com/   (geo-optimizer-skill 4.18.3)
+   score 90/100 (excellent)   <span class="hl">excluding Tier C: 68/76 = 89%</span>
+   robots=18/18, llms=16/18, schema=16/16, meta=14/14, content=12/12,
+   signals=3/6, ai_discovery=6/6, brand_entity=5/10, penalty=0
+   [B] Add sameAs links in Organization schema to Wikipedia, Wikidata, ...
+   [C] Add RSS/Atom feed and link it in &lt;head&gt; ...
+   [C] Add potentialAction (SearchAction) to WebSite schema ...
+   [SEC] This page exposes user-generated content ('respond' region) ...</code></pre></figure>
+</section>
+<section id="tiers">
+  <h2>증거 등급</h2>
+  <p>AI 검색 점검 도구는 세 종류의 권고를 한 목록에 섞습니다. 문서로 확인되는 크롤러 동작, 그럴듯한 관행, 주요 엔진이 읽는다는 근거가 없는 <code>llms.txt</code> 같은 관례입니다. Google의 AI 최적화 안내(2026-07-10 갱신)는 Google 검색이 AI용 텍스트 파일과 특수 마크업을 무시한다고 밝힙니다.</p><p>x-eo는 모든 항목에 등급을 붙입니다. Tier C 항목만으로 오른 점수는 그렇게 표시해 보고합니다.</p>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>등급</th><th>뜻</th><th>예</th><th>처리</th></tr></thead><tbody><tr><td class="tier">A</td><td>검색엔진 문서로 확인되거나 직접 관찰 가능</td><td>HTTP 200, 원본 HTML의 본문, canonical, hreflang, 사이트맵, 파싱되고 화면과 일치하는 JSON-LD</td><td>먼저 수정</td></tr><tr><td class="tier">B</td><td>제3자 연구나 상관관계로만 뒷받침</td><td>답변형 문단, 최신성, 일관된 개체 이름과 <code>sameAs</code></td><td>독자에게도 도움이 될 때 적용</td></tr><tr><td class="tier">C</td><td>사용 근거가 없는 관례</td><td><code>llms.txt</code>, <code>ai.txt</code>, <code>/ai/*.json</code>, WebMCP</td><td>비용이 없을 때만 적용, 성과로 계산하지 않음</td></tr><tr><td class="tier">SEC</td><td>보안 항목</td><td>프롬프트 주입 경로, 노출된 비밀값</td><td>실제 쓰기 경로를 확인한 뒤 보고</td></tr></tbody></table></div>
+</section>
+<section id="skills">
+  <h2>스킬 4개와 작업 순서</h2>
+  <figure class="ds-figure"><ol class="loop"><li><code>x-eo-audit</code><span>실제 사이트 측정</span></li><li><code>x-eo-fix</code><span>결과물이 아닌 소스 수정</span></li><li><code>x-eo-verify</code><span>빌드 비교, JSON-LD, JavaScript 켬·끔 비교</span></li><li><code>배포</code><span>배포 후 실제 URL 재측정</span></li></ol><p class="loop-back">배포 후에는 같은 도구와 버전으로 x-eo-audit부터 다시 실행합니다.</p><p class="shared"><code>x-eo</code>에는 세 스킬이 함께 쓰는 내용이 있습니다. 증거 등급, 정직 원칙, 보고 양식, 함정 13개, 한국 가이드(네이버, 다음, 카카오톡), claude-seo(MIT)에서 가져온 주제별 가이드 12개입니다.</p></figure>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>스킬</th><th>스크립트</th></tr></thead><tbody><tr><td><code>x-eo-audit</code></td><td><code>audit.sh</code>(Tier C 포함·제외 점수, CI용 <code>--threshold</code>), <code>host-root-check.sh</code>, <code>site-sample.py</code>, <code>ai-recall.mjs</code>(검색이 연결된 AI API의 내 URL 인용 집계)</td></tr><tr><td><code>x-eo-fix</code></td><td><code>gen-robots.py</code>, JSON-LD 템플릿, 하위 경로 사이트용 루트 파일, <code>html-to-llms-full.mjs</code>, <code>gen-ai-files.mjs</code>, <code>indexnow.mjs</code></td></tr><tr><td><code>x-eo-verify</code></td><td><code>diff-builds.sh</code>, <code>jsonld-lint.py</code>, <code>render-diff.mjs</code>(Playwright), <code>local-audit.py</code></td></tr></tbody></table></div>
+</section>
+<section id="install">
+  <h2>설치</h2>
+  <p>네 스킬은 서로 참조하므로 모두 복사합니다. 설치 스크립트, 훅, 백그라운드 에이전트는 없습니다.</p>
+  <ol class="ds-steps"><li><div><h3>레포를 받고 스킬 복사</h3><div class="ds-cmd"><pre><code>git clone --depth 1 https://github.com/jungrok5/x-eo.git
+mkdir -p ~/.claude/skills &amp;&amp; cp -r x-eo/skills/* ~/.claude/skills/</code></pre><button type="button" >복사</button></div></div></li><li><div><h3>Claude Code에 요청</h3><p><code>x-eo로 https://example.com 을 점검하고 Tier A 항목을 고친 뒤 검증해 줘</code></p></div></li></ol>
+  <p class="ds-muted"><code>bash</code>, <code>git</code>, <code>python3</code> 3.10 이상이 필요합니다. <code>render-diff.mjs</code>는 <code>playwright-core</code>와 <code>PLAYWRIGHT_CHROMIUM</code>에 지정한 Chromium 경로가 추가로 필요합니다. <code>ai-recall.mjs</code>는 Anthropic 또는 OpenAI API 키가 필요하며 질문과 엔진마다 검색 요청 1회 비용이 발생합니다.</p>
+</section>
+<section id="direct">
+  <h2>에이전트 없이 스크립트 실행</h2>
+  <div class="ds-cmd"><pre><code>S=x-eo/skills
+bash    $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
+bash    $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
+python3 $S/x-eo-audit/scripts/site-sample.py https://example.com/ --max 8
+node    $S/x-eo-verify/scripts/render-diff.mjs https://example.com/
+python3 $S/x-eo-verify/scripts/jsonld-lint.py ./dist --require WebSite --strict
+python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.xml --out robots.txt</code></pre><button type="button" >복사</button></div>
+</section>
+<section id="example">
+  <h2>사례: 214개 언어 정적 사이트, 62점에서 90점</h2>
+  <p>오른 28점 중 12점은 Tier C입니다. Tier C를 빼면 52/76에서 68/76으로 올랐습니다.</p><p>효과를 측정할 수 있었던 변경은 한국어 루트 페이지의 사전 렌더링입니다. JavaScript 없이 보이는 본문이 렌더링된 화면의 11%에서 53%로 늘었고, JavaScript를 켠 화면의 DOM은 바이트 단위로 같았습니다.</p>
+  <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>항목</th><th class="num">전</th><th class="num">후</th><th>등급</th></tr></thead><tbody><tr><td><code>robots</code></td><td class="num">15</td><td class="num">18</td><td class="tier">A</td></tr><tr><td><code>llms</code></td><td class="num">10</td><td class="num">16</td><td class="tier">C</td></tr><tr><td><code>ai_discovery</code></td><td class="num">0</td><td class="num">6</td><td class="tier">C</td></tr><tr><td><code>schema</code></td><td class="num">7</td><td class="num">16</td><td class="tier">B</td></tr><tr><td><code>content</code></td><td class="num">11</td><td class="num">12</td><td class="tier">A</td></tr><tr><td><code>penalty</code></td><td class="num">-3</td><td class="num">0</td><td class="tier">A/B</td></tr><tr><td><strong>합계</strong></td><td class="num">62</td><td class="num"><strong>90</strong></td><td></td></tr></tbody></table></div>
+  <p><a href="https://github.com/jungrok5/x-eo/blob/main/examples/one-scroll-bible.md">전체 기록</a></p>
+</section>
+<section id="limits">
+  <h2>한계</h2>
+  <ul class="plain"><li><code>audit.sh</code>는 키워드 규칙으로 등급을 매깁니다. 등급이 틀릴 수 있으므로 항목 내용을 직접 확인합니다.</li><li>점수는 한 도구의 분류와 가중치를 따릅니다. 서로 다른 도구가 아니라 같은 도구, 같은 버전의 변경 전후를 비교합니다.</li><li><code>ai-recall.mjs</code>의 결과는 표본이며 비율이 아닙니다. 실행할 때마다 답이 달라지고 Perplexity는 지원하지 않습니다.</li><li><code>local-audit.py</code>는 geo-optimizer 내부를 수정하므로 업그레이드하면 동작하지 않을 수 있습니다. 그래서 버전을 고정합니다.</li><li>리눅스에서만 시험했습니다. 증거 기록과 한국 가이드에는 작성 날짜가 있으므로 사용 전에 다시 확인합니다.</li></ul>
+</section>
+<footer class="site"><p>MIT 라이선스. <code>skills/x-eo/references/claude-seo/</code>의 주제별 가이드는 claude-seo(MIT)에서 가져왔습니다.</p><p>이 페이지는 <a href="https://github.com/jungrok5/ai-design">ai-design</a>의 디자인 시스템 "Clear"로 만들었습니다.</p></footer>
+</main>
+<script src="../assets/design/copy.js" defer></script>
+</body>
+</html>
