@@ -173,7 +173,12 @@ def page(code):
 <meta property="og:description" content="{E(t['desc'])}">
 <meta property="og:url" content="{url}">
 <meta property="og:locale" content="{'en_US' if code == 'en' else 'ko_KR'}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{BASE}og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="x-eo: SEO, AEO and GEO audits graded by evidence, next to audit.sh output (score 90/100, excluding Tier C 68/76)">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{BASE}og.png">
 <link rel="icon" href="data:,">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <link rel="stylesheet" href="{pre}assets/design/tokens.css">
