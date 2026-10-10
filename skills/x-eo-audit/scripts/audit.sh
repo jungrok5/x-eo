@@ -46,8 +46,10 @@ def tier(r):
     if "injection" in l or "prompt" in l:
         return "SEC"   # trust/security finding, not a ranking lever
     # Entity details are only worth adding if TRUE for this site - never invent them (Tier B at best).
+    # Organization/FAQ markup: a site without an organization or a visible FAQ must not add one for points;
+    # FAQ rich results are limited to a few site types, so it is not an engine-documented requirement.
     if any(k in l for k in ("sameas", "address", "telephone", "contactpoint", "knowledge graph",
-                            "statistics", "numerical", "author", "brand")):
+                            "statistics", "numerical", "author", "brand", "organization", "faq")):
         return "B"
     if any(k in l for k in ("llms.txt", "ai.txt", "/ai/", "webmcp", "searchaction", "potentialaction",
                             "rss", "atom")) or re.search(r"\bforms?\b", l):
