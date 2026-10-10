@@ -1,0 +1,25 @@
+# Layout check and behaviour tests for every script. No network calls: HTTP tests use a local server.
+name: tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium for the render-diff test
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i playwright-core@1 >/dev/null
+          npx -y playwright@1 install chromium >/dev/null
+          echo "X_EO_TEST_NODE_MODULES=/tmp/pw/node_modules" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_CHROMIUM=$(find ~/.cache/ms-playwright -type f -name chrome -path '*chrome-linux*' | head -1)" >> "$GITHUB_ENV"
+      - run: python3 tests/validate.py
+      - run: python3 -m unittest discover -s tests -v

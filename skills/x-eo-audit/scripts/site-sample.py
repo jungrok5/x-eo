@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Site-level sample: what a crawler sees across several pages, not just one.
 
-usage: site-sample.py URL [--max 8] [--thin 1500] [--json]
+usage: site-sample.py URL [--max 8] [--thin 1500] [--json] [--fail-on A|B]
 
 Reads robots.txt (Sitemap: lines) and the sitemap, samples the home page plus up to --max pages spread
 across the sitemap, fetches each once, and reports per page: status, final URL, title, description,
@@ -42,7 +42,7 @@ class Page(HTMLParser):
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if tag == "html": self.lang = a.get("lang", "")
-        elif tag == "title": self._in = "title"
+        elif tag == "title" and not self._skip and not self.title: self._in = "title"   # not <svg><title>
         elif tag == "meta":
             n = (a.get("name") or "").lower(); p = (a.get("property") or "").lower(); c = a.get("content", "") or ""
             if n == "description": self.desc = c.strip()
@@ -58,7 +58,7 @@ class Page(HTMLParser):
         elif tag == "a" and a.get("href"): self.links.append(a["href"])
         elif tag == "img":
             self.img += 1
-            if not (a.get("alt") or "").strip() and a.get("alt") is None: self.img_noalt += 1
+            if a.get("alt") is None: self.img_noalt += 1   # alt="" is valid for decorative images
     def handle_endtag(self, tag):
         if tag == "title": self._in = None
         elif tag == "script":
@@ -88,6 +88,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("url"); ap.add_argument("--max", type=int, default=8); ap.add_argument("--thin", type=int, default=1500)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--fail-on", choices=["A", "B"], help="exit 1 if any issue of this tier (B includes A)")
     a = ap.parse_args()
     start = a.url if "://" in a.url else "https://" + a.url
     sp = urllib.parse.urlsplit(start); host = sp.netloc.lower(); root = f"{sp.scheme}://{sp.netloc}"
@@ -97,16 +98,21 @@ def main():
     sitemaps = re.findall(r"(?im)^\s*sitemap:\s*(\S+)", robots) if st == 200 else []
     if st != 200: issues.append(("A", "no /robots.txt at host root (HTTP %s)" % st))
     if not sitemaps: sitemaps = [root + "/sitemap.xml"]; issues.append(("A", "robots.txt has no Sitemap: line; trying /sitemap.xml"))
-    urls = []
-    for sm in sitemaps[:3]: urls += sitemap_urls(sm, host)
-    urls = list(dict.fromkeys(norm(u) for u in urls))
+    sitemap_raw = []
+    for sm in sitemaps[:3]: sitemap_raw += sitemap_urls(sm, host)
+    sitemap_raw = list(dict.fromkeys(sitemap_raw))
+    urls = list(dict.fromkeys(norm(u) for u in sitemap_raw))
     if not urls: issues.append(("A", "no sitemap URLs found on this host (%s)" % ", ".join(sitemaps[:3])))
     # sample: root home, the requested page, then evenly spread
-    sample = [norm(root + "/"), norm(start)]
-    if urls:
-        step = max(1, len(urls) // max(1, a.max - 2))
-        sample += urls[::step]
-    sample = list(dict.fromkeys(sample))[: max(2, a.max)]
+    # fetch URLs exactly as given or listed (some servers 404 without the trailing slash); dedupe by norm()
+    cand = [root + "/", start]
+    if sitemap_raw:
+        step = max(1, len(sitemap_raw) // max(1, a.max - 2))
+        cand += sitemap_raw[::step]
+    seen_k = set(); sample = []
+    for u in cand:
+        if norm(u) not in seen_k: seen_k.add(norm(u)); sample.append(u)
+    sample = sample[: max(2, a.max)]
     pages = []
     for u in sample:
         st, final, body = get(u)
@@ -115,8 +121,9 @@ def main():
         text = re.sub(r"\s+", " ", " ".join(p.text)).strip()
         internal = {norm(urllib.parse.urljoin(final, h)) for h in p.links if not h.startswith(("#", "mailto:", "tel:", "javascript:"))}
         internal = {x for x in internal if urllib.parse.urlsplit(x).netloc.lower() == host and x != norm(final)}
-        pages.append(dict(url=u, status=st, final=norm(final), title=p.title.strip(), title_len=len(p.title.strip()),
-            desc=p.desc, desc_len=len(p.desc), canonical=p.canonical, robots=p.robots, lang=p.lang, h1=p.h1,
+        canon = urllib.parse.urljoin(final, p.canonical) if p.canonical else ""
+        pages.append(dict(url=norm(u), status=st, final=norm(final), title=p.title.strip(), title_len=len(p.title.strip()),
+            desc=p.desc, desc_len=len(p.desc), canonical=canon, robots=p.robots, lang=p.lang, h1=p.h1,
             og=bool(p.og.get("og:title")) and bool(p.og.get("og:image")), jsonld=p.jsonld, jsonld_bad=p.jsonld_bad,
             text_len=len(text), internal_links=len(internal), img=p.img, img_noalt=p.img_noalt, refresh=bool(p.refresh)))
     # cross-page issues
@@ -145,7 +152,9 @@ def main():
         for v, n in Counter(p[key] for p in ok if p[key]).items():
             if n > 1: issues.append(("B", f"{n} sampled pages share the same {label}: {v[:60]!r}"))
     if a.json:
-        print(json.dumps(dict(host=host, sitemaps=sitemaps, sitemap_urls=len(urls), pages=pages, issues=issues, notes=notes), ensure_ascii=False, indent=1)); return
+        print(json.dumps(dict(host=host, sitemaps=sitemaps, sitemap_urls=len(urls), pages=pages, issues=issues, notes=notes), ensure_ascii=False, indent=1))
+        if a.fail_on and any(t == "A" or (a.fail_on == "B" and t == "B") for t, _ in issues): sys.exit(1)
+        return
     print(f"host {host} · sitemaps {len(sitemaps)} · {len(urls)} URLs in sitemap · sampled {len(pages)}")
     print(f"{'status':6} {'h1':>2} {'ld':>2} {'og':>2} {'text':>6} {'links':>5} {'title':>5} {'desc':>4}  url")
     for p in pages:
@@ -153,4 +162,5 @@ def main():
     print("issues:" if issues else "issues: none")
     for t, m in sorted(issues, key=lambda x: x[0]): print(f"  [{t}] {m}")
     for m in notes: print(f"  note: {m}")
+    if a.fail_on and any(t == "A" or (a.fail_on == "B" and t == "B") for t, _ in issues): sys.exit(1)
 main()

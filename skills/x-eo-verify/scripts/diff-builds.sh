@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Build the repo at BASE (default: HEAD) and in the working tree into separate dirs and show what differs.
 # Only intended files should differ. Usage: diff-builds.sh "<build cmd>" <output-dir> [base-ref]
+# Note: the working tree build runs in place, so generated files in your checkout are refreshed.
 #   diff-builds.sh "node tools/build-pages.mjs" . HEAD     # generator writes into the repo root
 #   diff-builds.sh "npm run build" dist origin/main
 set -euo pipefail

@@ -5,20 +5,22 @@
 // The metric here is a cited URL on your host — the thing that sends a reader to you.
 //
 // usage: node ai-recall.mjs --site https://example.com/ --q "question a user would really ask" [--q ...]
-//          [--engine anthropic,openai] [--brand "Name"] [--dry-run] [--json]
+//          [--engine anthropic,openai] [--brand "Name"] [--dry-run] [--json] [--match URL]
 // env:   ANTHROPIC_API_KEY (or an `ant auth login` profile)  ·  OPENAI_API_KEY  ·  OPENAI_MODEL (default gpt-5)
 // deps:  npm i @anthropic-ai/sdk   (loaded only when the anthropic engine runs)
 // cost:  each question = one web-search-enabled request per engine; you pay for it. Start with 3–5 questions.
 // status: the OpenAI path follows the documented Responses API shape but was written without a live key — verify once.
 const args = process.argv.slice(2)
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d }
-const all = (n) => args.flatMap((a, i) => (a === n ? [args[i + 1]] : []))
+const all = (n) => args.flatMap((a, i) => (a === n && args[i + 1] && !args[i + 1].startsWith('--') ? [args[i + 1]] : []))
 const flag = (n) => args.includes(n)
 const site = opt('--site'); const qs = all('--q'); const brand = opt('--brand', '')
-if (!site || !qs.length) { console.error('usage: node ai-recall.mjs --site URL --q "question" [--q ...] [--engine anthropic,openai] [--brand NAME] [--dry-run] [--json]'); process.exit(2) }
-const host = new URL(site).host.replace(/^www\./, '')
+if (!site || (!qs.length && !opt('--match'))) { console.error('usage: node ai-recall.mjs --site URL --q "question" [--q ...] [--engine anthropic,openai] [--brand NAME] [--dry-run] [--json]'); process.exit(2) }
+const siteU = new URL(site); const host = siteU.host.replace(/^www\./, '')
+const prefix = siteU.pathname.replace(/\/[^/]*\.[^/]*$/, '/').replace(/\/?$/, '/')   // /x-eo/ for https://user.github.io/x-eo/
 const engines = opt('--engine', 'anthropic,openai').split(',').map((s) => s.trim()).filter(Boolean)
-const onHost = (u) => { try { return new URL(u).host.replace(/^www\./, '') === host } catch { return false } }
+// sub-path sites (user.github.io/project/) share a host with other sites: require the path prefix too
+const onHost = (u) => { try { const x = new URL(u); return x.host.replace(/^www\./, '') === host && (x.pathname + '/').startsWith(prefix) } catch { return false } }
 const urlsIn = (t) => [...String(t).matchAll(/https?:\/\/[^\s)\]>"'`]+/g)].map((m) => m[0])
 
 // Guard: a question that names the site leaks the answer.
@@ -26,7 +28,9 @@ for (const q of qs) {
   const leaks = q.toLowerCase().includes(host) || (brand && q.toLowerCase().includes(brand.toLowerCase()))
   if (leaks) console.error(`! question names the site ("${q.slice(0, 60)}…") — any mention it produces proves nothing. Rephrase as a user who has never heard of you.`)
 }
-if (flag('--dry-run')) { console.log(`host ${host} · engines ${engines.join(',')} · ${qs.length} question(s)`); qs.forEach((q) => console.log('  - ' + q)); process.exit(0) }
+// --match URL: print whether a URL would count as a citation of --site (no API calls; used by the tests)
+if (opt('--match')) { console.log(onHost(opt('--match')) ? 'match' : 'no match'); process.exit(0) }
+if (flag('--dry-run')) { console.log(`site ${host}${prefix} · engines ${engines.join(',')} · ${qs.length} question(s)`); qs.forEach((q) => console.log('  - ' + q)); process.exit(0) }
 
 async function anthropic(q) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')

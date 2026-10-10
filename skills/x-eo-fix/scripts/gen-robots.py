@@ -41,7 +41,11 @@ def main():
     ap.add_argument("--out", default="-")
     a = ap.parse_args()
     for d in a.disallow:
-        if d.strip() in ("", "/"): sys.exit("refusing blanket Disallow: /")
+        if d.strip() in ("", "/", "/*", "*"): sys.exit(f"refusing blanket Disallow: {d!r}")
+        if not d.startswith("/"): sys.exit(f"Disallow path must start with '/': {d!r}")
+    if not a.sitemap.startswith(("https://", "http://")): sys.exit("--sitemap must be an absolute URL")
+    if a.policy == "block-ai":
+        print("note: block-ai covers the bots listed in this script; unlisted crawlers fall under 'User-agent: *'", file=sys.stderr)
     L = [f"# robots.txt — policy: {a.policy}", ""]
     for purpose in ("classic", "search", "user", "train"):
         grp = [b for b in BOTS if b[2] == purpose]
@@ -49,12 +53,13 @@ def main():
         for tok, vendor, _ in grp:
             L.append(f"User-agent: {tok}")
             if allowed(purpose, a.policy):
-                L.append("Allow: /")
+                # Disallow before Allow: Google/Bing pick the longest match either way, but first-match parsers need this order
                 L += [f"Disallow: {d}" for d in a.disallow]
+                L.append("Allow: /")
             else:
                 L.append("Disallow: /")
             L.append("")
-    L += ["# Everyone else", "User-agent: *", "Allow: /"] + [f"Disallow: {d}" for d in a.disallow] + ["", f"Sitemap: {a.sitemap}", ""]
+    L += ["# Everyone else", "User-agent: *"] + [f"Disallow: {d}" for d in a.disallow] + ["Allow: /", "", f"Sitemap: {a.sitemap}", ""]
     txt = "\n".join(L)
     if a.out == "-": sys.stdout.write(txt)
     else:

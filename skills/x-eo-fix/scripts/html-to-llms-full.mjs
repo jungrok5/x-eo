@@ -15,12 +15,14 @@ const from = opt('--from'), to = opt('--to')
 if (from) {
   const a = html.indexOf(from); if (a < 0) { console.error('--from marker not found'); process.exit(1) }
   const b = to ? html.indexOf(to, a) : -1
+  if (to && b < 0) console.error('warning: --to marker not found; using the rest of the file')
   html = html.slice(a, b > a ? b : undefined)
 } else {
   const m = html.match(/<body[^>]*>([\s\S]*)<\/body>/i); if (m) html = m[1]
 }
 const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ', '&rarr;': '→', '&times;': '×', '&middot;': '·', '&mdash;': '—', '&ndash;': '–' }
-const decode = (s) => s.replace(/&[a-z#0-9]+;/gi, (e) => ENT[e] ?? e)
+const decode = (s) => s.replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+  .replace(/&#([0-9]+);/g, (_, d) => String.fromCodePoint(+d)).replace(/&[a-z]+;/gi, (e) => ENT[e] ?? e)
 const text = html
   .replace(/<(script|style|video|svg|noscript|template)\b[\s\S]*?<\/\1>/gi, '')
   .replace(/<!--[\s\S]*?-->/g, '')

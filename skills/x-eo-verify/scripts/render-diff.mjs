@@ -23,7 +23,8 @@ async function snap(js) {
   await ctx.close(); return r
 }
 const off = await snap(false), on = await snap(true)
-const ratio = on.chars ? off.chars / on.chars : 1
+if (!on.chars) { console.log('JS on rendered no text: blank page, error page or blocked request -> PROBLEM'); await browser.close(); process.exit(1) }
+const ratio = off.chars / on.chars
 console.log(`JS off: ${off.chars} chars, ${off.headings} headings, main=${off.mainChars ?? 'n/a'}${off.mainEmpty ? ' (EMPTY)' : ''}`)
 console.log(`JS on : ${on.chars} chars, ${on.headings} headings, main=${on.mainChars ?? 'n/a'}`)
 console.log(`no-JS shows ${(ratio * 100).toFixed(0)}% of the rendered text ->`, ratio < 0.5 ? 'PROBLEM [A]: crawlers without JS miss most of the page' : 'OK')

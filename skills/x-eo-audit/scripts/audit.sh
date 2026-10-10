@@ -6,15 +6,18 @@ set -euo pipefail
 VER="${GEO_OPTIMIZER_VERSION:-4.18.3}"
 THRESHOLD=""; OUT=""; URLS=()
 while [ $# -gt 0 ]; do case "$1" in
-  --threshold) THRESHOLD="$2"; shift 2;;
-  --out) OUT="$2"; shift 2;;
+  --threshold) THRESHOLD="${2:?--threshold needs a number}"; shift 2;;
+  --out) OUT="${2:?--out needs a directory}"; shift 2;;
   -h|--help) sed -n 2,5p "$0"; exit 0;;
   *) URLS+=("$1"); shift;; esac; done
 [ ${#URLS[@]} -gt 0 ] || { echo "usage: audit.sh [--threshold N] [--out DIR] URL..." >&2; exit 2; }
+[[ -z "$THRESHOLD" || "$THRESHOLD" =~ ^[0-9]+$ ]] || { echo "--threshold must be an integer 0-100" >&2; exit 2; }
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 python3 -m venv "$T/v"
 "$T/v/bin/pip" install -q "geo-optimizer-skill==${VER}" 2>&1 | grep -v "notice" || true
+# pip's exit code is lost in the pipe above; check the result instead of reporting every URL as "audit failed".
+[ -x "$T/v/bin/geo" ] || { echo "audit.sh: could not install geo-optimizer-skill==${VER} (network, Python version, or bad GEO_OPTIMIZER_VERSION)" >&2; exit 4; }
 [ -n "$OUT" ] && mkdir -p "$OUT"
 
 cat > "$T/summarize.py" <<'PYEOF'
@@ -28,7 +31,7 @@ except Exception:
 bd = d.get("score_breakdown") or {}
 MAX = {"robots": 18, "llms": 18, "schema": 16, "meta": 14, "content": 12,
        "signals": 6, "ai_discovery": 6, "brand_entity": 10}
-score = d.get("score", 0)
+score = d.get("score") or 0
 # Tier C = llms.txt + AI-discovery files: conventions with no demonstrated consumption by major engines.
 c_pts = bd.get("llms", 0) + bd.get("ai_discovery", 0)
 c_max = MAX["llms"] + MAX["ai_discovery"]
@@ -51,8 +54,8 @@ def tier(r):
     if any(k in l for k in ("sameas", "address", "telephone", "contactpoint", "knowledge graph",
                             "statistics", "numerical", "author", "brand", "organization", "faq")):
         return "B"
-    if any(k in l for k in ("llms.txt", "ai.txt", "/ai/", "webmcp", "searchaction", "potentialaction",
-                            "rss", "atom")) or re.search(r"\bforms?\b", l):
+    if any(k in l for k in ("llms.txt", "ai.txt", "/ai/", "webmcp", "searchaction", "potentialaction")) \
+            or re.search(r"\b(forms?|rss|atom)\b", l):
         return "C"
     if any(k in l for k in ("robots", "canonical", "hreflang", "title", "description", "javascript",
                             "sitemap", "json-ld", "schema", "h1", "heading", "<main>")):

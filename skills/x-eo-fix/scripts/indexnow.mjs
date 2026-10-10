@@ -9,17 +9,20 @@ const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1
 const flag = (name) => args.includes(name)
 const host = opt('--host'), key = opt('--key')
 if (!host || !key) { console.error('usage: node indexnow.mjs --host H --key K [--key-location URL] [--sitemap URL] [--dry-run] [URL...]'); process.exit(2) }
-if (!/^[0-9a-fA-F-]{8,128}$/.test(key)) { console.error('key must be 8-128 chars of [0-9a-f-]'); process.exit(2) }
+if (!/^[A-Za-z0-9-]{8,128}$/.test(key)) { console.error('key must be 8-128 chars of [A-Za-z0-9-] (IndexNow spec)'); process.exit(2) }
 const keyLocation = opt('--key-location') || `https://${host}/${key}.txt`
 
 const valued = new Set(['--host', '--key', '--key-location', '--sitemap'])
 const urls = args.filter((a, i) => !a.startsWith('--') && !valued.has(args[i - 1]))
 const sm = opt('--sitemap')
 if (sm) {
-  const xml = await (await fetch(sm)).text()
+  const r = await fetch(sm).catch((e) => ({ ok: false, status: e.message }))
+  if (!r.ok) { console.error(`sitemap fetch failed: ${sm} (${r.status})`); process.exit(1) }
+  const xml = await r.text()
   for (const m of xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)) urls.push(m[1])
 }
-const list = [...new Set(urls)].filter((u) => new URL(u).host === host)   // IndexNow accepts only URLs on `host`
+const onHost = (u) => { try { return new URL(u).host === host } catch { return false } }
+const list = [...new Set(urls)].filter(onHost)   // IndexNow accepts only URLs on `host`
 if (!list.length) { console.error('no URLs on host', host); process.exit(2) }
 
 // Pre-flight: the key file must be live, or the submission is wasted.

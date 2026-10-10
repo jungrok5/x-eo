@@ -83,7 +83,7 @@ python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.
 - `render-diff.mjs`의 50% 기준은 판단에 따른 값입니다.
 - 리눅스에서만 시험했습니다. 증거 기록과 `korea.md`에는 작성 날짜가 있으므로 사용 전에 다시 확인합니다.
 
-레포 구조 검사: `python3 tests/validate.py`
+테스트: `python3 tests/validate.py`(레포 구조), `python3 -m unittest discover -s tests`(모든 스크립트의 동작을 로컬 테스트 서버로 검사, 외부 네트워크 사용 안 함). 두 검사 모두 CI에서 실행됩니다.
 
 ## 출처와 라이선스
 

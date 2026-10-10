@@ -84,7 +84,7 @@ byte-identical.
 - The 50% threshold in `render-diff.mjs` is a judgment call.
 - Tested on Linux. The evidence ledger and `korea.md` are dated; check them again before relying on them.
 
-Repository layout check: `python3 tests/validate.py`.
+Tests: `python3 tests/validate.py` (layout) and `python3 -m unittest discover -s tests` (behaviour of every script against a local fixture server; no network). Both run in CI.
 
 ## Credits and license
 
