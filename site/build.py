@@ -4,7 +4,8 @@
 usage: python3 site/build.py      -> site/index.html, site/ko/index.html, site/sitemap.xml
 Both pages share one structure so they cannot drift; only the strings in T differ.
 """
-import html, json, pathlib
+import html, json, pathlib, re
+re_tags = re.compile(r"<[^>]+>")
 
 ROOT = pathlib.Path(__file__).resolve().parent
 BASE = "https://jungrok5.github.io/x-eo/"
@@ -75,6 +76,11 @@ T = {
              "The change with measurable value was prerendering the Korean root page: text visible without JavaScript rose from 11% to 53% of the rendered page, and the JavaScript-on DOM stayed byte-identical."],
   example_head=("Category", "Before", "After", "Tier"),
   example_link="Full write-up",
+  faq_h="Questions",
+  faq=[("Does x-eo change my site on its own?", "No. The skills act only when you ask your agent. <code>x-eo-fix</code> edits the source in your repository, and nothing goes live until you deploy. There is no installer, hook or background agent."),
+       ("Do I need an API key?", "Only for <code>ai-recall.mjs</code>, which needs an Anthropic or OpenAI key and costs one search-enabled request per question and engine. The audit, fix and verify scripts run without keys."),
+       ("Will a higher score bring more visitors?", "Not necessarily. The score follows one tool's weights, and Google says it ignores AI text files. That is why x-eo reports the score with and without Tier C points, and why citation by AI engines is only sampled.")],
+  author='Made by <a href="https://jungrok5.github.io/resume/">Jeongrok Oh</a>.',
   limits_h="Limits",
   limits=["<code>audit.sh</code> assigns tiers with keyword rules. A label can be wrong; read the finding.",
           "Scores come from one tool and its author's weights. Compare the same tool and version before and after, not different tools.",
@@ -123,6 +129,11 @@ T = {
              "효과를 측정할 수 있었던 변경은 한국어 루트 페이지의 사전 렌더링입니다. JavaScript 없이 보이는 본문이 렌더링된 화면의 11%에서 53%로 늘었고, JavaScript를 켠 화면의 DOM은 바이트 단위로 같았습니다."],
   example_head=("항목", "전", "후", "등급"),
   example_link="전체 기록",
+  faq_h="자주 묻는 질문",
+  faq=[("x-eo가 사이트를 스스로 바꿉니까?", "아닙니다. 스킬은 에이전트에 요청할 때만 동작합니다. <code>x-eo-fix</code>는 레포의 소스만 수정합니다. 배포하기 전에는 실제 사이트에 반영되지 않습니다. 설치 스크립트, 훅, 백그라운드 에이전트는 없습니다."),
+       ("API 키가 필요합니까?", "<code>ai-recall.mjs</code>에만 필요합니다. Anthropic 또는 OpenAI 키가 필요하고 질문과 엔진마다 검색 요청 1회 비용이 발생합니다. 점검, 수정, 검증 스크립트는 키 없이 실행됩니다."),
+       ("점수가 오르면 방문자가 늘어납니까?", "반드시 그렇지는 않습니다. 점수는 한 도구의 가중치를 따릅니다. Google은 AI용 텍스트 파일을 무시한다고 밝혔습니다. 그래서 x-eo는 점수를 Tier C 포함·제외로 함께 보고합니다. AI 엔진의 인용은 표본으로만 확인합니다.")],
+  author='만든 사람: <a href="https://jungrok5.github.io/resume/">오정록</a>',
   limits_h="한계",
   limits=["<code>audit.sh</code>는 키워드 규칙으로 등급을 매깁니다. 등급이 틀릴 수 있으므로 항목 내용을 직접 확인합니다.",
           "점수는 한 도구의 분류와 가중치를 따릅니다. 서로 다른 도구가 아니라 같은 도구, 같은 버전의 변경 전후를 비교합니다.",
@@ -141,9 +152,17 @@ def cmd(text, t):
 
 def page(code):
     t = T[code]; url = BASE + t["path"]; pre = "../" if t["path"] else ""
-    ld = {"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "x-eo", "url": url,
-          "codeRepository": REPO, "description": t["desc"], "inLanguage": t["lang"], "license": "https://opensource.org/licenses/MIT",
-          "programmingLanguage": ["Python", "JavaScript", "Shell"], "runtimePlatform": "Claude Code"}
+    person = {"@type": "Person", "@id": "https://jungrok5.github.io/resume/#person", "name": "오정록 (Jeongrok Oh)",
+              "url": "https://jungrok5.github.io/resume/",
+              "sameAs": ["https://github.com/jungrok5", "https://www.linkedin.com/in/jungrok5"]}
+    ld = {"@context": "https://schema.org", "@graph": [
+        {"@type": "WebSite", "@id": BASE + "#website", "name": "x-eo", "url": BASE, "inLanguage": ["en", "ko"], "author": {"@id": person["@id"]}},
+        {"@type": "SoftwareSourceCode", "name": "x-eo", "url": url, "codeRepository": REPO, "description": t["desc"],
+         "inLanguage": t["lang"], "license": "https://opensource.org/licenses/MIT", "programmingLanguage": ["Python", "JavaScript", "Shell"],
+         "runtimePlatform": "Claude Code", "author": {"@id": person["@id"]}, "isPartOf": {"@id": BASE + "#website"}},
+        {"@type": "FAQPage", "inLanguage": t["lang"], "mainEntity": [
+            {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": html.unescape(re_tags.sub("", a))}} for q, a in t["faq"]]},
+        person]}
     rows = lambda head, body: ("<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr>" +
         "".join(f"<th>{h}</th>" for h in head) + "</tr></thead><tbody>" + body + "</tbody></table></div>")
     tiers = "".join(f'<tr><td class="tier">{a}</td><td>{b}</td><td>{c}</td><td>{d}</td></tr>' for a, b, c, d in t["tiers"])
@@ -231,11 +250,15 @@ def page(code):
   <div class="ds-table-wrap"><table class="ds-table"><thead><tr>{ex_head}</tr></thead><tbody>{ex}</tbody></table></div>
   <p><a href="{REPO}/blob/main/examples/one-scroll-bible.md">{t['example_link']}</a></p>
 </section>
+<section id="faq">
+  <h2>{t['faq_h']}</h2>
+  <div class="faq">{''.join(f'<h3>{q}</h3><p>{a}</p>' for q, a in t['faq'])}</div>
+</section>
 <section id="limits">
   <h2>{t['limits_h']}</h2>
   <ul class="plain">{''.join(f'<li>{x}</li>' for x in t['limits'])}</ul>
 </section>
-<footer class="site">{''.join(f'<p>{x}</p>' for x in t['foot'])}</footer>
+<footer class="site">{''.join(f'<p>{x}</p>' for x in t['foot'] + [t['author']])}</footer>
 </main>
 <script src="{pre}assets/design/copy.js" defer></script>
 </body>

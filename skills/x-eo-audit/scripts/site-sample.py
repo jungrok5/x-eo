@@ -91,7 +91,7 @@ def main():
     a = ap.parse_args()
     start = a.url if "://" in a.url else "https://" + a.url
     sp = urllib.parse.urlsplit(start); host = sp.netloc.lower(); root = f"{sp.scheme}://{sp.netloc}"
-    issues = []
+    issues = []; notes = []
     # robots + sitemaps (host root only)
     st, _, robots = get(root + "/robots.txt")
     sitemaps = re.findall(r"(?im)^\s*sitemap:\s*(\S+)", robots) if st == 200 else []
@@ -126,7 +126,8 @@ def main():
     for p in ok:
         if not p["title"]: issues.append(("A", f"{p['url']}: no <title>"))
         if "noindex" in p["robots"].lower() and p["url"] in urls: issues.append(("A", f"{p['url']}: noindex but listed in sitemap"))
-        if p["canonical"] and norm(p["canonical"]) != p["final"]: issues.append(("A", f"{p['url']}: canonical points to {p['canonical']} (this URL is not the canonical one)"))
+        # a meta-refresh stub is meant to point elsewhere (pitfall 12); judged separately below
+        if p["canonical"] and norm(p["canonical"]) != p["final"] and not p["refresh"]: issues.append(("A", f"{p['url']}: canonical points to {p['canonical']} (this URL is not the canonical one)"))
         if p["jsonld_bad"]: issues.append(("A", f"{p['url']}: {p['jsonld_bad']} JSON-LD block(s) fail to parse"))
         if not p["desc"]: issues.append(("B", f"{p['url']}: no meta description"))
         if p["h1"] != 1: issues.append(("B", f"{p['url']}: {p['h1']} <h1> (convention is exactly one)"))
@@ -135,16 +136,21 @@ def main():
         if p["img_noalt"]: issues.append(("B", f"{p['url']}: {p['img_noalt']}/{p['img']} images without alt"))
     home = pages[0]
     if home["refresh"] or (home["status"] == 200 and home["text_len"] < 300 and home["canonical"] and norm(home["canonical"]) != home["final"]):
-        issues.append(("A", f"host root {home['url']} is a redirect stub (meta refresh / canonical elsewhere): site-level checkers score it as your home page — give it a real title, description, OG and H1, or make it a real page"))
+        missing = [k for k, ok_ in (("title", home["title"]), ("description", home["desc"]), ("og:title/og:image", home["og"]), ("h1", home["h1"] >= 1)) if not ok_]
+        if missing:
+            issues.append(("B", f"host root {home['url']} is a redirect stub missing {', '.join(missing)}: site-level checkers score it as your home page and link previews show it — add them (canonical stays on the real page) or make it a real page"))
+        else:
+            notes.append(f"host root {home['url']} is a redirect stub with title, description, OG and H1 — deliberate, not an issue (checkers may still call it thin)")
     for key, label in (("title", "title"), ("desc", "description")):
         for v, n in Counter(p[key] for p in ok if p[key]).items():
             if n > 1: issues.append(("B", f"{n} sampled pages share the same {label}: {v[:60]!r}"))
     if a.json:
-        print(json.dumps(dict(host=host, sitemaps=sitemaps, sitemap_urls=len(urls), pages=pages, issues=issues), ensure_ascii=False, indent=1)); return
+        print(json.dumps(dict(host=host, sitemaps=sitemaps, sitemap_urls=len(urls), pages=pages, issues=issues, notes=notes), ensure_ascii=False, indent=1)); return
     print(f"host {host} · sitemaps {len(sitemaps)} · {len(urls)} URLs in sitemap · sampled {len(pages)}")
     print(f"{'status':6} {'h1':>2} {'ld':>2} {'og':>2} {'text':>6} {'links':>5} {'title':>5} {'desc':>4}  url")
     for p in pages:
         print(f"{p['status']:<6} {p['h1']:>2} {p['jsonld']:>2} {'y' if p['og'] else '-':>2} {p['text_len']:>6} {p['internal_links']:>5} {p['title_len']:>5} {p['desc_len']:>4}  {p['url']}")
     print("issues:" if issues else "issues: none")
     for t, m in sorted(issues, key=lambda x: x[0]): print(f"  [{t}] {m}")
+    for m in notes: print(f"  note: {m}")
 main()
