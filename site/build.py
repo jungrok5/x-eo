@@ -12,6 +12,9 @@ ROOT = pathlib.Path(__file__).resolve().parent
 BASE = "https://jungrok5.github.io/x-eo/"
 REPO = "https://github.com/jungrok5/x-eo"
 E = html.escape
+# content hash on the share image URL: chat apps (KakaoTalk, Slack) cache previews by URL
+import hashlib
+OG_V = hashlib.sha1((ROOT / "og.png").read_bytes()).hexdigest()[:8]
 
 PLUGIN = "claude plugin marketplace add jungrok5/x-eo\nclaude plugin install x-eo@x-eo"
 MANUAL = "git clone --depth 1 https://github.com/jungrok5/x-eo.git\nmkdir -p ~/.claude/skills && cp -r x-eo/plugins/x-eo/skills/* ~/.claude/skills/"
@@ -242,12 +245,12 @@ def page(code):
 <meta property="og:description" content="{E(t['desc'])}">
 <meta property="og:url" content="{url}">
 <meta property="og:locale" content="{'en_US' if code == 'en' else 'ko_KR'}">
-<meta property="og:image" content="{BASE}og.png">
+<meta property="og:image" content="{BASE}og.png?v={OG_V}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="x-eo: SEO, AEO and GEO audits graded by evidence, next to audit.sh output (score 90/100, excluding Tier C 68/76)">
+<meta property="og:image:alt" content="x-eo, a Claude Code plugin: fix your site for search and AI answers, and prove nothing else broke. Report: score 53 to 61, excluding Tier C 70% to 80%.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{BASE}og.png">
+<meta name="twitter:image" content="{BASE}og.png?v={OG_V}">
 <link rel="icon" href="data:,">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <link rel="stylesheet" href="{pre}assets/design/tokens.css">
