@@ -234,7 +234,9 @@ class AuditSummary(unittest.TestCase):
                 "Add descriptive labels to forms": "C",
                 "Explain the anatomy of the page in one heading": "A",             # 'atom' inside a word is not RSS
                 "Possible prompt injection in user content": "SEC",
-                "Add sameAs links to Wikidata": "B"}
+                "Add sameAs links to Wikidata": "B",
+                "Create /ai/faq.json with structured FAQ for AI search visibility": "C",   # regression: 'faq' won over /ai/
+                "Create /llms.txt for AI indexing: geo llms --base-url https://e.com. Note: llms.txt is an organizational signal, not a proven ranking factor": "C"}
         out = self.summarize(json.dumps({"score": 70, "band": "good", "score_breakdown": {"llms": 10, "ai_discovery": 2},
                                          "recommendations": list(recs)})).stdout
         for rec, tier in recs.items():

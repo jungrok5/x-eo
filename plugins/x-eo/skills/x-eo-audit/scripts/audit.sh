@@ -48,15 +48,16 @@ def tier(r):
     l = r.lower()
     if "injection" in l or "prompt" in l:
         return "SEC"   # trust/security finding, not a ranking lever
+    # Convention files first: "/ai/faq.json" mentions FAQ but is Tier C, not FAQ markup.
+    if any(k in l for k in ("llms.txt", "ai.txt", "/ai/", "webmcp", "searchaction", "potentialaction")) \
+            or re.search(r"\b(forms?|rss|atom)\b", l):
+        return "C"
     # Entity details are only worth adding if TRUE for this site - never invent them (Tier B at best).
     # Organization/FAQ markup: a site without an organization or a visible FAQ must not add one for points;
     # FAQ rich results are limited to a few site types, so it is not an engine-documented requirement.
     if any(k in l for k in ("sameas", "address", "telephone", "contactpoint", "knowledge graph",
                             "statistics", "numerical", "author", "brand", "organization", "faq")):
         return "B"
-    if any(k in l for k in ("llms.txt", "ai.txt", "/ai/", "webmcp", "searchaction", "potentialaction")) \
-            or re.search(r"\b(forms?|rss|atom)\b", l):
-        return "C"
     if any(k in l for k in ("robots", "canonical", "hreflang", "title", "description", "javascript",
                             "sitemap", "json-ld", "schema", "h1", "heading", "<main>")):
         return "A"
