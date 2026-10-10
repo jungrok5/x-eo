@@ -10,7 +10,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 R = pathlib.Path(__file__).resolve().parent.parent
-S = R / "skills"
+S = R / "plugins/x-eo/skills"
 AUDIT = S / "x-eo-audit/scripts"; FIX = S / "x-eo-fix/scripts"; VERIFY = S / "x-eo-verify/scripts"
 PY = sys.executable
 

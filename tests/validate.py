@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Repo layout checks: 4 skills, frontmatter name == dir, no stray SKILL.md, relative links resolve, scripts parse."""
 import re, subprocess, sys, pathlib
-R = pathlib.Path(__file__).resolve().parent.parent; S = R / "skills"; bad = []
+R = pathlib.Path(__file__).resolve().parent.parent; S = R / "plugins/x-eo/skills"; bad = []
 want = {"x-eo", "x-eo-audit", "x-eo-fix", "x-eo-verify"}
 found = {p.parent.name for p in S.rglob("SKILL.md")}
 if found != want: bad.append(f"SKILL.md dirs {sorted(found)} != {sorted(want)}")
@@ -24,4 +24,10 @@ for f in S.rglob("*.sh"):
     if subprocess.run(["bash", "-n", str(f)]).returncode: bad.append(f"{f}: bash syntax")
 for f in S.rglob("*.mjs"):
     if subprocess.run(["node", "--check", str(f)], capture_output=True).returncode: bad.append(f"{f}: node syntax")
+import json
+mk = json.loads((R / ".claude-plugin/marketplace.json").read_text()); pl = json.loads((R / "plugins/x-eo/.claude-plugin/plugin.json").read_text())
+entry = next((x for x in mk.get("plugins", []) if x.get("name") == pl.get("name")), None)
+if not entry: bad.append("marketplace.json has no entry for the plugin")
+elif not (mk.get("version") == entry.get("version") == pl.get("version")): bad.append(f"versions differ: marketplace {mk.get('version')}, entry {entry.get('version')}, plugin {pl.get('version')}")
+elif (R / entry["source"]).resolve() != (R / "plugins/x-eo").resolve(): bad.append(f"marketplace source {entry['source']} is not plugins/x-eo")
 print("\n".join(bad) or "ok"); sys.exit(1 if bad else 0)

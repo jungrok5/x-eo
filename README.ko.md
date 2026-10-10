@@ -41,24 +41,50 @@ flowchart LR
 
 ## 설치
 
-네 스킬은 서로 참조하므로 모두 복사합니다. 설치 스크립트, 훅, 백그라운드 에이전트는 없습니다.
+x-eo는 Claude Code 플러그인입니다. 마켓플레이스를 한 번 추가하고 플러그인을 설치하면 스킬 4개가 함께 설치됩니다.
+
+```bash
+claude plugin marketplace add jungrok5/x-eo
+claude plugin install x-eo@x-eo
+```
+
+Claude Code 안에서는 `/plugin install x-eo --marketplace jungrok5/x-eo` 한 줄로 같은 일을 합니다. 갱신은
+`claude plugin update x-eo@x-eo`로 받습니다. 프로젝트의 모든 팀원에게 켜려면 프로젝트의 `.claude/settings.json`에
+다음을 추가합니다.
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "x-eo": { "source": { "source": "github", "repo": "jungrok5/x-eo" } }
+  },
+  "enabledPlugins": { "x-eo@x-eo": true }
+}
+```
+
+플러그인 기능을 쓰지 않으려면 스킬을 직접 복사합니다. 네 스킬은 서로 참조하므로 모두 복사합니다. 어느 방식이든 훅과
+백그라운드 에이전트는 없습니다.
 
 ```bash
 git clone --depth 1 https://github.com/jungrok5/x-eo.git
-mkdir -p ~/.claude/skills && cp -r x-eo/skills/* ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -r x-eo/plugins/x-eo/skills/* ~/.claude/skills/
 ```
 
-한 프로젝트에만 쓰려면 그 프로젝트의 `.claude/skills/`에 복사합니다. `bash`, `git`, `python3` 3.10 이상이
-필요합니다. `render-diff.mjs`는 `npm i playwright-core`와 `PLAYWRIGHT_CHROMIUM`에 지정한 Chromium 경로가 추가로
-필요합니다. `ai-recall.mjs`는 `ANTHROPIC_API_KEY` 또는 `OPENAI_API_KEY`가 필요하며 질문과 엔진마다 검색 요청 1회
-비용이 발생합니다.
+`bash`, `git`, `python3` 3.10 이상이 필요합니다. `render-diff.mjs`는 `npm i playwright-core`와
+`PLAYWRIGHT_CHROMIUM`에 지정한 Chromium 경로가 추가로 필요합니다. `ai-recall.mjs`는 `ANTHROPIC_API_KEY` 또는
+`OPENAI_API_KEY`가 필요하며 질문과 엔진마다 검색 요청 1회 비용이 발생합니다.
 
-설치 후 Claude Code에 `x-eo로 https://example.com 을 점검하고 Tier A 항목을 고친 뒤 검증해 줘`라고 요청합니다.
+설치 후 Claude Code에 다음처럼 요청합니다.
+
+```text
+x-eo로 https://example.com 을 점검해 줘. 아직 고치지는 마.
+x-eo-fix로 Tier A 항목을 고치고 x-eo-verify로 검증해 줘.
+배포했어. 같은 도구와 버전으로 실제 URL을 다시 측정해 줘.
+```
 
 ## 스크립트 직접 실행
 
 ```bash
-S=x-eo/skills
+S=x-eo/plugins/x-eo/skills
 bash    $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
 bash    $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
 python3 $S/x-eo-audit/scripts/site-sample.py https://example.com/ --max 8
@@ -87,5 +113,5 @@ python3 $S/x-eo-fix/scripts/gen-robots.py --sitemap https://example.com/sitemap.
 
 ## 출처와 라이선스
 
-MIT. `skills/x-eo/references/claude-seo/`의 주제별 가이드는 claude-seo(MIT)에서 가져왔고 출처는 같은 폴더의
+MIT. `plugins/x-eo/skills/x-eo/references/claude-seo/`의 주제별 가이드는 claude-seo(MIT)에서 가져왔고 출처는 같은 폴더의
 `NOTICE.md`에 있습니다. 함께 검토한 도구와 각 도구의 장단점은 `references/tools.md`에 있습니다.

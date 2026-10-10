@@ -41,24 +41,50 @@ flowchart LR
 
 ## Install
 
-Copy all four skills; they reference each other. There is no installer, hook or background agent.
+x-eo is a Claude Code plugin. Add the marketplace once and install the plugin; all four skills come together.
+
+```bash
+claude plugin marketplace add jungrok5/x-eo
+claude plugin install x-eo@x-eo
+```
+
+Inside Claude Code the same is one command: `/plugin install x-eo --marketplace jungrok5/x-eo`. Updates arrive with
+`claude plugin update x-eo@x-eo`. To turn it on for everyone in a project, add this to the project's
+`.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "x-eo": { "source": { "source": "github", "repo": "jungrok5/x-eo" } }
+  },
+  "enabledPlugins": { "x-eo@x-eo": true }
+}
+```
+
+Without the plugin system, copy the skills; they reference each other, so copy all four. There is no hook or
+background agent either way.
 
 ```bash
 git clone --depth 1 https://github.com/jungrok5/x-eo.git
-mkdir -p ~/.claude/skills && cp -r x-eo/skills/* ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -r x-eo/plugins/x-eo/skills/* ~/.claude/skills/
 ```
 
-For one project only, copy into `.claude/skills/` in that project instead. Requirements: `bash`, `git`,
-`python3` 3.10 or later. `render-diff.mjs` also needs `npm i playwright-core` and a Chromium path in
-`PLAYWRIGHT_CHROMIUM`. `ai-recall.mjs` needs `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` and costs one search-enabled
-request per question and engine.
+Requirements: `bash`, `git`, `python3` 3.10 or later. `render-diff.mjs` also needs `npm i playwright-core` and a
+Chromium path in `PLAYWRIGHT_CHROMIUM`. `ai-recall.mjs` needs `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` and costs one
+search-enabled request per question and engine.
 
-Then ask Claude Code: `Audit https://example.com with x-eo, fix the Tier A findings, and verify.`
+Then ask Claude Code, for example:
+
+```text
+Audit https://example.com with x-eo. Do not change anything yet.
+Fix the Tier A findings with x-eo-fix, then verify with x-eo-verify.
+We deployed. Re-measure the live URL with the same tool and version.
+```
 
 ## Run the scripts directly
 
 ```bash
-S=x-eo/skills
+S=x-eo/plugins/x-eo/skills
 bash    $S/x-eo-audit/scripts/audit.sh --threshold 80 https://example.com/
 bash    $S/x-eo-audit/scripts/host-root-check.sh https://example.com/blog/
 python3 $S/x-eo-audit/scripts/site-sample.py https://example.com/ --max 8
@@ -88,5 +114,5 @@ Tests: `python3 tests/validate.py` (layout) and `python3 -m unittest discover -s
 
 ## Credits and license
 
-MIT. The topic guides in `skills/x-eo/references/claude-seo/` come from claude-seo (MIT); attribution is in
+MIT. The topic guides in `plugins/x-eo/skills/x-eo/references/claude-seo/` come from claude-seo (MIT); attribution is in
 `NOTICE.md` there. `references/tools.md` records what other tools were reviewed and what each does well and poorly.

@@ -19,16 +19,23 @@ main section > :is(.ds-table-wrap, .ds-figure, .ds-steps, .ds-cmd, .ds-note, ul)
 .hero { display: grid; gap: var(--space-6); align-items: start; }
 @media (min-width: 960px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-7); } }
 .hero .ds-lede { margin-top: var(--space-4); }
+.hero .who { margin-top: var(--space-3); font-size: var(--text-s); color: var(--subtle); max-width: var(--measure); }
 .hero .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
 
 .term { margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-l); overflow: hidden; }
 .term figcaption { padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--code-muted); border-bottom: 1px solid var(--code-muted); }
 .term pre {
   margin: 0; padding: var(--space-4); font-size: var(--text-xs); line-height: 1.75;
-  white-space: pre; overflow-x: auto; word-break: normal;
+  white-space: pre-wrap; overflow-wrap: anywhere; word-break: normal;
 }
 .term .ds-c { color: var(--code-muted); }
-.term .hl { color: var(--accent); font-weight: 500; }
+.nw { white-space: nowrap; }
+.report .ask { margin: 0; padding: var(--space-4) var(--space-4) 0; font: var(--text-xs) / 1.7 var(--font-mono); color: var(--code-muted); overflow-wrap: anywhere; }
+.report dl { margin: 0; padding: var(--space-3) var(--space-4) var(--space-4); display: grid; gap: var(--space-3); font: var(--text-xs) / 1.7 var(--font-mono); }
+.report dl > div { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: var(--space-3); }
+.report dt { color: var(--code-muted); }
+.report dd { margin: 0; overflow-wrap: anywhere; }
+.term .hl { color: var(--code-fg); font-weight: 700; }
 
 .loop { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 @media (min-width: 720px) { .loop { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); } }
@@ -42,10 +49,31 @@ main section > :is(.ds-table-wrap, .ds-figure, .ds-steps, .ds-cmd, .ds-note, ul)
 @media (min-width: 720px) {
   .loop li:not(:last-child)::after { left: auto; right: calc(-1 * var(--space-5)); top: 50%; bottom: auto; width: var(--space-5); height: 1px; }
 }
-.loop-back { margin-top: var(--space-3); font-size: var(--text-s); color: var(--subtle); }
 .shared { margin-top: var(--space-4); border: 1px dashed var(--line-strong); border-radius: var(--radius-m); padding: var(--space-3) var(--space-4); font-size: var(--text-s); color: var(--muted); }
 
 .tier { font-family: var(--font-mono); }
+.ds-table tbody th { font-weight: 700; color: var(--fg); text-align: left; vertical-align: top; padding: 10px 16px 10px 0; border-bottom: var(--border); white-space: nowrap; }
+@media (max-width: 719px) { .ds-table tbody th { white-space: normal; } }
+
+/* evidence tiers: label column + text, stacks on narrow screens instead of a 4-column table */
+.tiers { margin: var(--space-5) 0 0; display: grid; gap: 0; max-width: 960px; }
+.tier-row { display: grid; gap: var(--space-1) var(--space-5); padding: var(--space-3) 0; border-bottom: var(--border); }
+.tier-row:last-child { border-bottom: 0; }
+@media (min-width: 720px) { .tier-row { grid-template-columns: 260px minmax(0, 1fr); } }
+.tier-row dt { font-weight: 700; display: flex; gap: var(--space-3); align-items: baseline; }
+.tier-row dt .tier { min-width: 3ch; color: var(--accent); }
+.tier-row dd { margin: 0; color: var(--muted); }
+.tier-row dd strong { color: var(--fg); font-weight: 500; }
+
+.asks { display: grid; gap: var(--space-2); margin-top: var(--space-2); }
+.asks .ds-cmd pre, .asks .ds-cmd code { white-space: pre-wrap; }
+#start > .ds-cmd { margin-top: var(--space-2); }
+#start > p.ds-muted { margin-top: var(--space-4); max-width: var(--measure); }
+
+details.dev { border: var(--border); border-radius: var(--radius-l); padding: var(--space-4); }
+details.dev > summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+details.dev[open] > summary { margin-bottom: var(--space-4); }
+details.dev > * + * { margin-top: var(--space-4); }
 .ds-table td:first-child code { white-space: nowrap; }
 .ds-table .num { text-align: right; }
 .ds-table td.num, .ds-table th.num { padding-right: var(--space-4); }

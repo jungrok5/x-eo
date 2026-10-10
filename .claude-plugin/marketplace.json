@@ -1,0 +1,20 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "x-eo",
+  "version": "1.1.0",
+  "description": "SEO, AEO and GEO skills for Claude Code: audit a site, fix the source, verify nothing else changed, with an evidence tier on every recommendation.",
+  "owner": {
+    "name": "jungrok5",
+    "url": "https://github.com/jungrok5/x-eo"
+  },
+  "plugins": [
+    {
+      "name": "x-eo",
+      "source": "./plugins/x-eo",
+      "description": "x-eo-audit, x-eo-fix and x-eo-verify skills plus the x-eo router: evidence tiers (A documented, B plausible, C convention), host-root checks, JSON-LD and robots generators, build diffs and JS on/off render checks.",
+      "version": "1.1.0",
+      "category": "development",
+      "tags": ["seo", "aeo", "geo", "json-ld", "robots", "audit"]
+    }
+  ]
+}

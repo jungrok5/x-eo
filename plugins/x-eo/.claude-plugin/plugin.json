@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "x-eo",
+  "version": "1.1.0",
+  "description": "Audit a website for search engines and AI answer engines (SEO, AEO, GEO), fix the findings in the source, and verify that nothing else changed. Every recommendation carries an evidence tier, and scores are reported with and without convention-only (Tier C) points.",
+  "author": {
+    "name": "jungrok5",
+    "url": "https://github.com/jungrok5/x-eo"
+  },
+  "homepage": "https://jungrok5.github.io/x-eo/",
+  "repository": "https://github.com/jungrok5/x-eo",
+  "license": "MIT",
+  "keywords": ["seo", "aeo", "geo", "json-ld", "robots", "sitemap", "llms.txt", "audit"]
+}
