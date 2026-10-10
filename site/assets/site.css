@@ -1,0 +1,58 @@
+/* x-eo project page. Built on the "Clear" design system (assets/design/); every value comes from its tokens. */
+.top { position: sticky; top: 0; z-index: 10; }
+.top .brand { color: var(--fg); font-weight: 700; font-size: var(--text-m); font-family: var(--font-mono); }
+.top nav { display: flex; align-items: center; gap: var(--space-4); margin-left: auto; }
+.top a, .top .theme-toggle { min-height: 44px; display: inline-flex; align-items: center; }
+.theme-toggle {
+  background: none; border: var(--border); border-radius: var(--radius-m); color: var(--muted);
+  font: var(--text-s) / 1 var(--font-sans); padding: 0 var(--space-3); cursor: pointer;
+}
+.theme-toggle:hover { color: var(--fg); border-color: var(--line-strong); }
+
+main section { padding: var(--space-7) 0; border-top: var(--border); }
+main section:first-child { border-top: 0; padding-top: var(--space-6); }
+main section > h2 { margin-bottom: var(--space-4); }
+main section > p { max-width: var(--measure); }
+main section > p + p { margin-top: var(--space-3); }
+main section > :is(.ds-table-wrap, .ds-figure, .ds-steps, .ds-cmd, .ds-note, ul) { margin-top: var(--space-5); }
+
+.hero { display: grid; gap: var(--space-6); align-items: start; }
+@media (min-width: 960px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-7); } }
+.hero .ds-lede { margin-top: var(--space-4); }
+.hero .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+
+.term { margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: var(--radius-l); overflow: hidden; }
+.term figcaption { padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--code-muted); border-bottom: 1px solid var(--code-muted); }
+.term pre {
+  margin: 0; padding: var(--space-4); font-size: var(--text-xs); line-height: 1.75;
+  white-space: pre; overflow-x: auto; word-break: normal;
+}
+.term .ds-c { color: var(--code-muted); }
+.term .hl { color: var(--accent); font-weight: 500; }
+
+.loop { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+@media (min-width: 720px) { .loop { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); } }
+.loop li { position: relative; border: var(--border); border-radius: var(--radius-m); padding: var(--space-3) var(--space-4); background: var(--surface); }
+.loop li code { font-weight: 500; }
+.loop li span { display: block; font-size: var(--text-s); color: var(--muted); margin-top: var(--space-1); }
+.loop li:not(:last-child)::after {
+  content: ""; position: absolute; background: var(--line-strong);
+  left: 50%; bottom: calc(-1 * var(--space-2)); width: 1px; height: var(--space-2);
+}
+@media (min-width: 720px) {
+  .loop li:not(:last-child)::after { left: auto; right: calc(-1 * var(--space-5)); top: 50%; bottom: auto; width: var(--space-5); height: 1px; }
+}
+.loop-back { margin-top: var(--space-3); font-size: var(--text-s); color: var(--subtle); }
+.shared { margin-top: var(--space-4); border: 1px dashed var(--line-strong); border-radius: var(--radius-m); padding: var(--space-3) var(--space-4); font-size: var(--text-s); color: var(--muted); }
+
+.tier { font-family: var(--font-mono); }
+.ds-table td:first-child code { white-space: nowrap; }
+.ds-table .num { text-align: right; }
+.ds-table td.num, .ds-table th.num { padding-right: var(--space-4); }
+ul.plain { margin: 0; padding-left: var(--space-5); max-width: var(--measure); display: grid; gap: var(--space-2); }
+
+.ds-steps .ds-cmd { margin-top: var(--space-2); }
+.ds-steps > li > div { min-width: 0; }
+
+footer.site { border-top: var(--border); padding: var(--space-5) 0 var(--space-7); font-size: var(--text-s); color: var(--subtle); }
+footer.site p + p { margin-top: var(--space-2); }
